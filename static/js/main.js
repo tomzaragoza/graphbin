@@ -35,4 +35,21 @@ $("#viewport").mousedown(function(e){
 	return false;
 });
 
-sys.graft(data);
+$("#newNode").click(function(e) {
+	console.log("new node!");
+	// Get nodes from database
+	// insert the node information into the database
+	// If attaching the node to another node, must re-render the entire graph
+
+	// else if a node on it's own, just add it like so:
+	sys.addNode("n<COUNT>", {"mass": 50, "color": "black", "shape": "dot", "label": "XYZ", "fixed": true});
+});
+
+/*
+	With the given data, draw out the graph
+*/
+function graftArbor(sys) {
+	sys.graft(data);
+}
+
+graftArbor(sys);
