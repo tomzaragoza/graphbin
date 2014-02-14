@@ -1,59 +1,15 @@
 <html>
 		<head>
-				<script language="javascript" type="text/javascript" src="/static/jquery-1.10.2.min.js"></script>
-				<script language="javascript" type="text/javascript" src="/static/arbor/lib/arbor.js" ></script>
-				<script language="javascript" type="text/javascript" src="/static/arbor/demos/_/graphics.js" ></script>
-				<script language="javascript" type="text/javascript" src="/static/arbor/demos/halfviz/src/renderer.js" ></script>
+				<script type="text/javascript" src="/static/jquery-1.10.2.min.js"></script>
+				<script type="text/javascript" src="/static/arbor/lib/arbor.js" ></script>
+				<script type="text/javascript" src="/static/arbor/demos/_/graphics.js" ></script>
+				<script type="text/javascript" src="/static/arbor/demos/halfviz/src/renderer.js" ></script>
+				<link rel="stylesheet" href="/static/css/bootstrap.min.css"></script>
+				<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 		</head>
 		<body>
+			<button class="btn btn-success">New graph</button>
 			<center><canvas id="viewport" width="800" height="800" style="border:1px solid #000000;"></canvas></center>
-			<script language="javascript" type="text/javascript">
-				var sys = arbor.ParticleSystem({repulsion: 0, stiffness:1000, friction: 0.5, gravity: false});
-				sys.parameters({gravity:false});
-				sys.renderer = Renderer("#viewport") ;
-				var data = {
-					nodes:{
-						n1:{'color':'black','shape':'dot','label':'200', 'mass': 50, 'fixed': true},
-						n2:{'color':'black','shape':'dot','label':'100', 'mass': 50, 'fixed': true},
-						n3:{'color':'black','shape':'dot','label':'300', 'mass': 50, 'fixed': true},
-						n4:{'color':'black','shape':'dot','label':'350', 'mass': 50, 'fixed': true},
-						n5:{'color':'black','shape':'dot','label':'150', 'mass': 50, 'fixed': true},
-					},
-					edges:{
-						n1:{ n2:{}, n3:{} },
-						n2:{ n5:{} },
-						n3:{ n4:{} }
-					}
-				};
-
-				$("#viewport").mousedown(function(e){
-					var pos = $(this).offset();
-					var p = {x:e.pageX-pos.left, y:e.pageY-pos.top}
-					selected = nearest = dragged = sys.nearest(p);
-
-					if (selected.node !== null && selected.distance < 15){
-						console.log("===========================");
-						console.log("This is the nearest node");
-						console.log(nearest.distance);
-						console.log(selected.node);
-						console.log("x coordinates of selected node");
-						console.log(selected.node.p.x);
-						console.log("y coordinates of selected node");
-						console.log(selected.node.p.y);
-						dragged.node.fixed = true;
-					}
-					return false;
-				});
-				// console.log("node1");
-				// console.log(data.nodes.n1);
-				sys.graft(data);
-				// var myNode = sys.getNode('n1');
-				// console.log("point");
-				// console.log(myNode.p);
-				// console.log(myNode._p.x);
-				// console.log(myNode._p);
-				
-				
-			</script>
+			<script type="text/javascript" src="/static/js/main.js"></script>
 		</body>
 </html>
