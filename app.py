@@ -30,26 +30,50 @@ def dbSetup():
 def index():
 	return render_template('index.html')
 
-@app.route('/store', methods=["POST"])
-def store():
-	""" """
+@app.route('/store/<graphname>', methods=["POST"])
+def store(graphname):
+	""" 
+		Store the node into the DB. 
+		Will act as a function to update the coordinates 
+		of the nodes as well.
+	"""
 
-	print "STORE"
-	# print dict(request.form)
+	print "Storing node to DB..."
 	label = request.form["label"]
 	color = request.form["color"]
 	shape = request.form["shape"]
-	# mass = request.form["mass"] # Mass will always be 50
-	# print label, color, shape, mass
+	node_name = request.form["node_name"]
+	x = request.form["x"]
+	y = request.form["y"]
 
-	node_info = {"label": label, "color": color, "shape": shape}
-	# r.db(DB_NAME).table("graph1").insert(node_info).run()
-	cursor = r.db(DB_NAME).table("graph1").run()
+	node_info = {
+					"label": label,
+					"color": color, 
+					"shape": shape,
+					"node_name": node_name,
+					"x": x, 
+					"y": y
+				}
+
+	table_connection = r.db(DB_NAME).table(graphname)
+	if not table_connection.get(node_name):
+		table_connection.insert(node_info).run()
+	else:
+		table_connection.filter(r.row["node_name"] == node_name).update(node_info).run()
+	
+	cursor = r.db(DB_NAME).table(graphname).run()
 	for d in cursor:
 		pretty(d)
 
 	return "stored successfully"
 
+@app.route('/load/<graphname>', methods=["GET"])
+def load(graphname):
+	"""
+		Load each node information
+	"""
+
+	return []
 if __name__ == '__main__':
 	SETUPDB = True
 	if SETUPDB:

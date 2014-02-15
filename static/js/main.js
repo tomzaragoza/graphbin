@@ -1,21 +1,27 @@
+
+/* Load the ArborJS environment */
 var sys = arbor.ParticleSystem({repulsion: 0, stiffness:1000, friction: 0.5, gravity: false});
 sys.parameters({gravity:false});
 sys.renderer = Renderer("#viewport");
 
-persistentAddNode(sys, "n1", {"mass": 50, "color": "black", "shape": "dot", "label": "200", "fixed": true});
-persistentAddNode(sys, "n2", {"mass": 50, "color": "black", "shape": "dot", "label": "100", "fixed": true});
-persistentAddNode(sys, "n3", {"mass": 50, "color": "black", "shape": "dot", "label": "300", "fixed": true});
-persistentAddNode(sys, "n4", {"mass": 50, "color": "black", "shape": "dot", "label": "350", "fixed": true});
-persistentAddNode(sys, "n5", {"mass": 50, "color": "black", "shape": "dot", "label": "150", "fixed": true});
+persistentAddNode(sys, "graph1", "n1", {"x": -3.467437209640285 , "y": -0.318212010897696, "mass": 50, "color": "black", "shape": "dot", "label": "200", "fixed": true});
+persistentAddNode(sys, "graph1", "n2", {"x": -1.6054553796477616, "y": -0.318212010897696, "mass": 50, "color": "black", "shape": "dot", "label": "100", "fixed": true});
+persistentAddNode(sys, "graph1", "n3", {"x": -1.6054553796477616, "y": -0.318212010897696, "mass": 50, "color": "black", "shape": "dot", "label": "300", "fixed": true});
+persistentAddNode(sys, "graph1", "n4", {"x": -1.6054553796477616, "y": -0.318212010897696, "mass": 50, "color": "black", "shape": "dot", "label": "350", "fixed": true});
+persistentAddNode(sys, "graph1", "n5", {"x": -1.6054553796477616, "y": -0.318212010897696, "mass": 50, "color": "black", "shape": "dot", "label": "150", "fixed": true});
 
 
-function persistentAddNode(sys, nodeName, params) {
+function persistentAddNode(sys, graphName, nodeName, params) {
 	sys.addNode(nodeName, params);
-	// Store the x and y coordinates and pass that in to params
+
+	var newNode = sys.getNode(nodeName);
+	params['x'] = newNode.p.x;
+	params['y'] = newNode.p.y;
+	params['node_name'] = nodeName;
 	console.log(params);
 	$.ajax({
 			type: "POST",
-			url: '/store',
+			url: '/store/' + graphName,
 			data: params,
 			success: function(data) {
 				console.log(data);
@@ -23,35 +29,15 @@ function persistentAddNode(sys, nodeName, params) {
 		});
 }
 
-$("#viewport").mousedown(function(e){
-	var pos = $(this).offset();
-	var p = {x:e.pageX-pos.left, y:e.pageY-pos.top};
-	nearestNode = sys.nearest(p);
-
-	if (nearestNode.node !== null && nearestNode.distance < 15){
-		console.log("===========================");
-		console.log("This is the nearest node");
-		console.log(nearestNode.distance);
-		console.log(nearestNode.node);
-		console.log("x coordinates of nearestNode node");
-		console.log(nearestNode.node.p.x);
-		console.log("y coordinates of nearestNode node");
-		console.log(nearestNode.node.p.y);
-		nearestNode.node.fixed = true;
-	}
-	return false;
-});
-
-$("#newNode").click(function(e) {
-	console.log("new node!");
-	// Get nodes from database
-	// insert the node information into the database
-	// If attaching the node to another node, must re-render the entire graph
-
-	// else if a node on it's own, just add it like so:
-	sys.addNode("n<COUNT>", {"mass": 50, "color": "black", "shape": "dot", "label": "XYZ", "fixed": true});
-});
-
+function loadNodes(sys, graphName) {
+	$.ajax({
+		type: "GET",
+		url: "/load/" + graphName,
+		success: function(data) {
+			console.log(data);
+		}
+	});
+}
 /*
 	With the given data, draw out the graph
 */
