@@ -19,18 +19,18 @@ var data = {
 $("#viewport").mousedown(function(e){
 	var pos = $(this).offset();
 	var p = {x:e.pageX-pos.left, y:e.pageY-pos.top}
-	selected = nearest = dragged = sys.nearest(p);
+	nearestNode = sys.nearest(p);
 
-	if (selected.node !== null && selected.distance < 15){
+	if (nearestNode.node !== null && nearestNode.distance < 15){
 		console.log("===========================");
 		console.log("This is the nearest node");
 		console.log(nearest.distance);
-		console.log(selected.node);
-		console.log("x coordinates of selected node");
-		console.log(selected.node.p.x);
-		console.log("y coordinates of selected node");
-		console.log(selected.node.p.y);
-		dragged.node.fixed = true;
+		console.log(nearestNode.node);
+		console.log("x coordinates of nearestNode node");
+		console.log(nearestNode.node.p.x);
+		console.log("y coordinates of nearestNode node");
+		console.log(nearestNode.node.p.y);
+		nearestNode.node.fixed = true;
 	}
 	return false;
 });
