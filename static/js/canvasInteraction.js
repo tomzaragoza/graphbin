@@ -47,7 +47,6 @@ $("#viewport").mouseup(function(e) {
 			});
 		}
 		e.preventDefault();
-
 });
 
 $("#newNode").click(function(e) {

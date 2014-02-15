@@ -61,9 +61,10 @@ def store(graphname):
 	else:
 		table_connection.filter(r.row["node_name"] == node_name).update(node_info).run()
 	
-	cursor = r.db(DB_NAME).table(graphname).run()
-	for d in cursor:
-		pretty(d)
+	# Printing out all the documents in the table
+	# cursor = r.db(DB_NAME).table(graphname).run()
+	# for d in cursor:
+	# 	pretty(d)
 
 	return "stored successfully"
 
@@ -73,7 +74,24 @@ def load(graphname):
 		Load each node information
 	"""
 
-	return []
+	all_nodes = []
+	cursor = r.db(DB_NAME).table(graphname).run()
+	for d in cursor:
+		# Just turn into string (from unicode) or float
+		# might not have to do this, but just in case
+		del d['id']
+		d['node_name'] = str(d['node_name'])
+		d['color'] = str(d['color'])
+		d['shape'] = str(d['shape'])
+		d['label'] = str(d['label'])
+		d['x'] = float(d['x'])
+		d['y'] = float(d['y'])
+
+		all_nodes.append(d)
+	print
+	pretty(all_nodes)
+	print
+	return jsonify(nodes=all_nodes)
 if __name__ == '__main__':
 	SETUPDB = True
 	if SETUPDB:
