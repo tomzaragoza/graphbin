@@ -24,7 +24,7 @@ $("#viewport").mousedown(function(e){
 	if (nearestNode.node !== null && nearestNode.distance < 15){
 		console.log("===========================");
 		console.log("This is the nearest node");
-		console.log(nearest.distance);
+		console.log(nearestNode.distance);
 		console.log(nearestNode.node);
 		console.log("x coordinates of nearestNode node");
 		console.log(nearestNode.node.p.x);
