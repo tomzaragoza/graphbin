@@ -1,24 +1,31 @@
 var sys = arbor.ParticleSystem({repulsion: 0, stiffness:1000, friction: 0.5, gravity: false});
 sys.parameters({gravity:false});
-sys.renderer = Renderer("#viewport") ;
-var data = {
-	nodes:{
-		n1:{'color':'black','shape':'dot','label':'200', 'mass': 50, 'fixed': true},
-		n2:{'color':'black','shape':'dot','label':'100', 'mass': 50, 'fixed': true},
-		n3:{'color':'black','shape':'dot','label':'300', 'mass': 50, 'fixed': true},
-		n4:{'color':'black','shape':'dot','label':'350', 'mass': 50, 'fixed': true},
-		n5:{'color':'black','shape':'dot','label':'150', 'mass': 50, 'fixed': true},
-	},
-	edges:{
-		n1:{ n2:{}, n3:{} },
-		n2:{ n5:{} },
-		n3:{ n4:{} }
-	}
-};
+sys.renderer = Renderer("#viewport");
+
+persistentAddNode(sys, "n1", {"mass": 50, "color": "black", "shape": "dot", "label": "200", "fixed": true});
+persistentAddNode(sys, "n2", {"mass": 50, "color": "black", "shape": "dot", "label": "100", "fixed": true});
+persistentAddNode(sys, "n3", {"mass": 50, "color": "black", "shape": "dot", "label": "300", "fixed": true});
+persistentAddNode(sys, "n4", {"mass": 50, "color": "black", "shape": "dot", "label": "350", "fixed": true});
+persistentAddNode(sys, "n5", {"mass": 50, "color": "black", "shape": "dot", "label": "150", "fixed": true});
+
+
+function persistentAddNode(sys, nodeName, params) {
+	sys.addNode(nodeName, params);
+	// Store the x and y coordinates and pass that in to params
+	console.log(params);
+	$.ajax({
+			type: "POST",
+			url: '/store',
+			data: params,
+			success: function(data) {
+				console.log(data);
+			}
+		});
+}
 
 $("#viewport").mousedown(function(e){
 	var pos = $(this).offset();
-	var p = {x:e.pageX-pos.left, y:e.pageY-pos.top}
+	var p = {x:e.pageX-pos.left, y:e.pageY-pos.top};
 	nearestNode = sys.nearest(p);
 
 	if (nearestNode.node !== null && nearestNode.distance < 15){
@@ -48,8 +55,8 @@ $("#newNode").click(function(e) {
 /*
 	With the given data, draw out the graph
 */
-function graftArbor(sys) {
+function graftArbor(sys, data) {
 	sys.graft(data);
 }
 
-graftArbor(sys);
+// graftArbor(sys);
