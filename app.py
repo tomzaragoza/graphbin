@@ -97,9 +97,7 @@ def store(graphname):
 
 @app.route('/load/<graphname>', methods=["GET"])
 def load(graphname):
-	"""
-		Load each node, edge information
-	"""
+	""" Load each node, edge information """
 
 	all_nodes = []
 	cursor_nodes = r.db(DB_NAME).table(graphname).filter(r.row["type"] == "node").run()
@@ -123,13 +121,27 @@ def load(graphname):
 		d['source'] = str(d['source'])
 		d['target'] = str(d['target'])
 		all_edges.append(d)
-	print "All the nodes"
-	pretty(all_nodes)
-	print
-	print "All the edges"
-	pretty(all_edges)
+
+	# print "All the nodes"
+	# pretty(all_nodes)
+	# print
+	# print "All the edges"
+	# pretty(all_edges)
 
 	return jsonify(nodes=all_nodes, edges=all_edges)
+
+@app.route('/delete/<graphname>', methods=["POST"])
+def delete(graphname):
+
+	node_name = request.form["node_name"]
+	edges_to_delete = request.form["edges_to_delete"].split(',')
+
+	for edge_name in edges_to_delete:
+		r.db(DB_NAME).table(graphname).filter(r.row["edge_name"] == edge_name).delete().run()
+
+	r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).delete().run()
+
+	return "succesfull delete node {0} and its edges".format(node_name)
 if __name__ == '__main__':
 	SETUPDB = True
 	if SETUPDB:

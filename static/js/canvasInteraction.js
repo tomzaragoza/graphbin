@@ -7,7 +7,7 @@ $("#viewport").mousedown(function(e){
 	var pos = $(this).offset();
 	var p = {x:e.pageX-pos.left, y:e.pageY-pos.top};
 	nearestNode = sys.nearest(p);
-	// console.log(nearestNode);
+
 	if (nearestNode.node !== null && nearestNode.distance < 15){
 
 		if (shift_f === true) {
@@ -18,19 +18,46 @@ $("#viewport").mousedown(function(e){
 			$("#target").html(nearestNode.node.name);
 		}
 
-		if (shift_delete === true) {
-			alert("delete?");
+		var edgesFrom = sys.getEdgesFrom(nearestNode.node);
+		var edgesTo = sys.getEdgesTo(nearestNode.node);
+
+		var edgesToDelete = [];
+		for (var i = 0; i < edgesFrom.length; i++) {
+			var edgeFromInDB = edgesFrom[i].source.name + ' to ' + edgesFrom[i].target.name;
+			edgesToDelete.push(edgeFromInDB);
 		}
-		var params = {
-						'node_name': nearestNode.node.name,
-						'x': nearestNode.node.p.x,
-						'y': nearestNode.node.p.y
-				};
-		// console.log("MOUSEDOWN");
-		// console.log(params.x);
-		// console.log(params.y);
+
+		for (var j = 0; j < edgesTo.length; j++) {
+			var edgeToInDB = edgesTo[j].source.name + ' to ' + edgesTo[j].target.name;
+			edgesToDelete.push(edgeToInDB);
+		}
+
+		if (shift_delete === true) {
+			shift_delete = false;
+			if (confirm("delete?")) {
+				var nodeNameToDelete = sys.getNode(nearestNode.node.name);
+				
+				sys.pruneNode(nodeNameToDelete);
+				var params = {
+								'node_name': nearestNode.node.name,
+								'edges_to_delete': edgesToDelete.toString()
+					};
+
+				$.ajax({
+					type:"POST",
+					url: "/delete/graph1",
+					data: params,
+					success: function(data) {
+						console.log("sucessfully deleted");
+					}
+				});
+				e.preventDefault();
+			} else {
+				console.log("do not delete the node");
+			}
+		}
+		e.preventDefault();
 	}
-	e.preventDefault();
 });
 
 $("#viewport").mouseup(function(e) {
@@ -48,9 +75,6 @@ $("#viewport").mouseup(function(e) {
 							'x': nearestNode.node.p.x,
 							'y': nearestNode.node.p.y
 					};
-			// console.log("MOUSEUP");
-			// console.log(params.x);
-			// console.log(params.y);
 			$.ajax({
 					type: "POST",
 					url: "/store/graph1",
