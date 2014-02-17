@@ -1,13 +1,8 @@
-/*
-	This will be the dragging function
-*/
-
 var ctrl_f = false;
 var ctrl_t = false;
 
 $("#viewport").mousedown(function(e){
 	// Will need graphname
-
 	var pos = $(this).offset();
 	var p = {x:e.pageX-pos.left, y:e.pageY-pos.top};
 	nearestNode = sys.nearest(p);
@@ -32,28 +27,6 @@ $("#viewport").mousedown(function(e){
 	}
 	e.preventDefault();
 });
-
-$(document).keydown(function(e){
-
-	if(e.shiftKey && e.keyCode == 70){
-		ctrl_f = true;
-	} else if(e.shiftKey && e.keyCode == 84){
-		ctrl_t = true;
-	}
-	e.preventDefault();
-});
-
-$(document).keyup(function (e) {
-	// console.log("setting to false");
-	ctrl_f = false;
-	ctrl_t = false;
-});
-
-// $(document).keypress("f",function(e) {
-// 	$("#viewport").mousedown(function (e1) {
-// 		console.log("we clicked");
-// 	});
-// });
 
 $("#viewport").mouseup(function(e) {
 	var pos = $(this).offset();
@@ -85,6 +58,26 @@ $("#viewport").mouseup(function(e) {
 		e.preventDefault();
 });
 
+
+/*
+	Node selection for adding edges
+*/
+$(document).keydown(function(e){
+
+	if(e.shiftKey && e.keyCode == 70){
+		ctrl_f = true;
+	} else if(e.shiftKey && e.keyCode == 84){
+		ctrl_t = true;
+	}
+	e.preventDefault();
+});
+
+$(document).keyup(function (e) {
+	// console.log("setting to false");
+	ctrl_f = false;
+	ctrl_t = false;
+});
+
 $("#newNode").click(function(e) {
 	console.log("new node!");
 	// Get nodes from database
@@ -97,24 +90,31 @@ $("#newNode").click(function(e) {
 
 
 $("#addEdge").click(function(e) {
-	var n_source = sys.getNode('n1');
-	var n_target = sys.getNode('n2');
-	
-	sys.addEdge(n_source, n_target); // Don't need to specify length.
-	var params = {
-					'source': 'n1',
-					'target': 'n2',
-					'name': 'n1 to n2',
-					'type': 'edge'
-		};
-	$.ajax({
-			type: "POST",
-			url: "/store/graph1",
-			data: params,
-			success: function(data) {
-				console.log(data);
-			}
-	});
-	e.preventDefault();
-	// console.log(sys.getEdgesFrom(n_source));
+
+	var n_source_name = $("#source").html();
+	var n_target_name = $("#target").html();
+
+	if (n_source_name.length > 0 && n_target_name.length > 0 ) {
+		var n_source = sys.getNode(n_source_name);
+		var n_target = sys.getNode(n_target_name);
+		
+		sys.addEdge(n_source, n_target); // Don't need to specify length.
+		var params = {
+						'source': n_source_name,
+						'target': n_target_name,
+						'name': n_source_name + ' to ' + n_target_name,
+						'type': 'edge'
+			};
+		$.ajax({
+				type: "POST",
+				url: "/store/graph1",
+				data: params,
+				success: function(data) {
+					console.log(data);
+				}
+		});
+		e.preventDefault();
+	} else {
+		alert("Please select two appropriate nodes to add an edge to.");
+	}
 });
