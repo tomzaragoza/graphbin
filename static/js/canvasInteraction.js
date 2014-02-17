@@ -66,23 +66,24 @@ $("#viewport").mouseup(function(e) {
 	nearestNode = sys.nearest(p);
 	
 	if (nearestNode.node !== null){
-			var params = {
-							'label': nearestNode.node.data.label,
-							'color': nearestNode.node.data.color,
-							'shape': nearestNode.node.data.shape,
-							'node_name': nearestNode.node.name,
-							'type': 'node',
-							'x': nearestNode.node.p.x,
-							'y': nearestNode.node.p.y
-					};
-			$.ajax({
-					type: "POST",
-					url: "/store/graph1",
-					data: params,
-					success: function(data) {
-						console.log(data);
-					}
-			});
+		console.log(nearestNode.node);
+		var params = {
+						'label': nearestNode.node.data.label,
+						'color': nearestNode.node.data.color,
+						'shape': nearestNode.node.data.shape,
+						'node_name': nearestNode.node.name,
+						'type': 'node',
+						'x': nearestNode.node.p.x,
+						'y': nearestNode.node.p.y
+				};
+		$.ajax({
+				type: "POST",
+				url: "/store/graph1",
+				data: params,
+				success: function(data) {
+					console.log(data);
+				}
+		});
 		}
 		e.preventDefault();
 });
@@ -91,7 +92,7 @@ $("#viewport").mouseup(function(e) {
 /*
 	Node selection for adding edges
 */
-$(document).keydown(function(e){
+$("#viewport").keydown(function(e){
 
 	if(e.shiftKey && e.keyCode == 70){
 		shift_f = true;
@@ -103,7 +104,7 @@ $(document).keydown(function(e){
 	e.preventDefault();
 });
 
-$(document).keyup(function (e) {
+$("#viewport").keyup(function (e) {
 	shift_f = false;
 	shift_t = false;
 	shift_delete = false;
@@ -113,12 +114,45 @@ $("#newNode").click(function(e) {
 	console.log("new node!");
 	// Get nodes from database
 	// insert the node information into the database
-	// If attaching the node to another node, must re-render the entire graph
+	var nodeLabel = $("#node-label").val();
+	var nodeName = $("#node-name").val();
+	var canCreateNode = false;
 
-	// else if a node on it's own, just add it like so:
-	sys.addNode("n9999", {"mass": 50, "color": "black", "shape": "dot", "label": "XYZ", "fixed": true});
+	if (nodeName === '' || ~nodeName.indexOf(',')) {
+		alert("Incorrect node name: must not contain commas or be empty");
+		// also check if it is unique
+	}
+	if (nodeLabel === '') {
+		alert("Incorrect node label: must not be empty");
+	}
+
+	canCreateNode = true; // passed the two tests above
+
+	var newNode = sys.addNode(nodeName, {"mass": 50, "color": "black", "shape": "dot", "label": nodeLabel, "fixed": true});
+	var point = newNode.p;
+	console.log(point);
+	// console.log(newNode);
+	// console.log(newNode._p.x);
+	// console.log(newNode._p.y);
+	var params = {
+					'label': nodeLabel,
+					'color': "black",
+					'shape': "dot",
+					'node_name': nodeName,
+					'type': 'node',
+					'x': newNode.p.x,
+					'y': newNode.p.y,
+					'p': point
+				};
+	$.ajax({
+			type: "POST",
+			url: "/store/graph1",
+			data: params,
+			success: function(data) {
+				console.log(data);
+			}
+	});
 });
-
 
 $("#addEdge").click(function(e) {
 

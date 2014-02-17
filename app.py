@@ -46,6 +46,8 @@ def store(graphname):
 		graph_obj_type = request.form["type"]
 		x = request.form["x"]
 		y = request.form["y"]
+		p = request.form["p"]
+		print p
 
 		node_info = {
 						"label": label,
@@ -59,13 +61,14 @@ def store(graphname):
 						"y": y
 					}
 
-		cursor = r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).run()
-		if len(list(cursor)) == 0:
-			print "Insert node {0}".format(node_name)
-			r.db(DB_NAME).table(graphname).insert(node_info).run()
-		else:
-			print "Update node {0}".format(node_name)
-			r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).update(node_info).run()
+		# cursor = r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).run()
+		# if len(list(cursor)) == 0:
+		# 	print "Insert node {0}".format(node_name)
+		# 	r.db(DB_NAME).table(graphname).insert(node_info).run()
+		# else:
+		# 	print "Update node {0}".format(node_name)
+		# 	r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).update(node_info).run()
+		print 'dont insert for now'
 
 		# Printing out all the documents in the table
 		# cursor = r.db(DB_NAME).table(graphname).run()
@@ -141,7 +144,7 @@ def delete(graphname):
 
 	r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).delete().run()
 
-	return "succesfull delete node {0} and its edges".format(node_name)
+	return "succesfully deleted node {0} and its edges".format(node_name)
 if __name__ == '__main__':
 	SETUPDB = True
 	if SETUPDB:
