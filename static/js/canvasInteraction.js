@@ -111,6 +111,8 @@ $("#addEdge").click(function(e) {
 				data: params,
 				success: function(data) {
 					console.log(data);
+					$("#source").empty();
+					$("#target").empty();
 				}
 		});
 		e.preventDefault();
