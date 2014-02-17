@@ -1,5 +1,6 @@
-var ctrl_f = false;
-var ctrl_t = false;
+var shift_f = false;
+var shift_t = false;
+var shift_delete = false;
 
 $("#viewport").mousedown(function(e){
 	// Will need graphname
@@ -9,12 +10,16 @@ $("#viewport").mousedown(function(e){
 	// console.log(nearestNode);
 	if (nearestNode.node !== null && nearestNode.distance < 15){
 
-		if (ctrl_f === true) {
+		if (shift_f === true) {
 			$("#source").html(nearestNode.node.name);
 		}
 
-		if (ctrl_t === true) {
+		if (shift_t === true) {
 			$("#target").html(nearestNode.node.name);
+		}
+
+		if (shift_delete === true) {
+			alert("delete?");
 		}
 		var params = {
 						'node_name': nearestNode.node.name,
@@ -65,17 +70,19 @@ $("#viewport").mouseup(function(e) {
 $(document).keydown(function(e){
 
 	if(e.shiftKey && e.keyCode == 70){
-		ctrl_f = true;
+		shift_f = true;
 	} else if(e.shiftKey && e.keyCode == 84){
-		ctrl_t = true;
+		shift_t = true;
+	} else if (e.shiftKey && e.keyCode == 68) {
+		shift_delete = true;
 	}
 	e.preventDefault();
 });
 
 $(document).keyup(function (e) {
-	// console.log("setting to false");
-	ctrl_f = false;
-	ctrl_t = false;
+	shift_f = false;
+	shift_t = false;
+	shift_delete = false;
 });
 
 $("#newNode").click(function(e) {
