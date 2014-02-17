@@ -8,14 +8,19 @@
 				<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 		</head>
 		<body>
-			<div class="container pull-left">
-				<div id="controls">
-					<button class="btn btn-success" id="newNode">New Node</button>
+			<div class="container" style="padding-top: 50px;">
+				<h1> GraphBin </h1>
+				<div id="controls" class="pull-left">
+
+					<input class="form-control" id="node-label" maxlength="15" placeholder="enter node value">
+					<input class="form-control" id="node-name" maxlength="15" placeholder="enter node name">
+					<button class="btn btn-success" id="newNode">Add Node</button>
+
+					<h4>Source node: <strong id="source"></strong></h4>
+					<h4>Target node: <strong id="target"></strong></h4>
 					<button class="btn btn-success" id="addEdge">Add Edge</button>
-					<p>Source node: <div id="source"></div></p>
-					<p>Target node: <div id="target"></div></p>
 				</div>
-				<div id="graph" class="pull-left">
+				<div id="graph" class="pull-right">
 					<canvas id="viewport" width="800" height="800" style="border: 1px solid #000;"></canvas>
 				</div>
 			</div>

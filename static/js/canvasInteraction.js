@@ -85,7 +85,7 @@ $("#newNode").click(function(e) {
 	// If attaching the node to another node, must re-render the entire graph
 
 	// else if a node on it's own, just add it like so:
-	sys.addNode("n<COUNT>", {"mass": 50, "color": "black", "shape": "dot", "label": "XYZ", "fixed": true});
+	sys.addNode("n9999", {"mass": 50, "color": "black", "shape": "dot", "label": "XYZ", "fixed": true});
 });
 
 
