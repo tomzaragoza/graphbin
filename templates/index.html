@@ -8,11 +8,17 @@
 				<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 		</head>
 		<body>
-			<div class="container">
-				<button class="btn btn-success" id="newNode">New Node</button>
-				<button class="btn btn-success" id="addEdge">Add Edge</button>
+			<div class="container pull-left">
+				<div id="controls">
+					<button class="btn btn-success" id="newNode">New Node</button>
+					<button class="btn btn-success" id="addEdge">Add Edge</button>
+					<p>Source node: <div id="source"></div></p>
+					<p>Target node: <div id="target"></div></p>
+				</div>
+				<div id="graph" class="pull-left">
+					<canvas id="viewport" width="800" height="800" style="border: 1px solid #000;"></canvas>
+				</div>
 			</div>
-			<center><canvas id="viewport" width="800" height="800" style="border:1px solid #000000;"></canvas></center>
 			<script type="text/javascript" src="/static/js/main.js"></script>
 			<script type="text/javascript" src="/static/js/canvasInteraction.js"></script>
 

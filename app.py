@@ -53,7 +53,7 @@ def store(graphname):
 						"shape": shape,
 						"node_name": node_name,
 						"type": graph_obj_type,
-						"mass": 50,
+						"mass": 45,
 						"fixed": True,
 						"x": x, 
 						"y": y
@@ -128,7 +128,7 @@ def load(graphname):
 	print
 	print "All the edges"
 	pretty(all_edges)
-	
+
 	return jsonify(nodes=all_nodes, edges=all_edges)
 if __name__ == '__main__':
 	SETUPDB = True
