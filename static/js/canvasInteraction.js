@@ -93,8 +93,23 @@ $("#viewport").mouseup(function(e) {
 /*
 	Node selection for adding edges
 */
-$("#viewport").keydown(function(e){
+$("#selectionMode").click(function(e) {
+	if ($(this).attr("class").indexOf("btn-primary") !== -1) { // contains
+		$(this).removeClass("btn-primary");
+		$(this).addClass("btn-danger");
+		$(this).html("Done selecting");
+	} else {
+		$(this).removeClass("btn-danger");
+		$(this).addClass("btn-primary");
+		$(this).html("Selection mode");
+		$(document).focus();
+	}
+	$("#viewport").attr("tabindex", "0");
+	$("#viewport").focus();
+});
 
+$("#viewport").keydown(function(e){
+	console.log("keydown on viewport");
 	if(e.shiftKey && e.keyCode == 70){
 		shift_f = true;
 	} else if(e.shiftKey && e.keyCode == 84){
