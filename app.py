@@ -31,8 +31,8 @@ def index():
 	return render_template('index.html')
 
 @app.route('/graph/<graphname>')
-def graph():
-	return render_template('index.html')
+def graph(graphname):
+	return render_template('graph.html')
 
 @app.route('/store/<graphname>', methods=["POST"])
 def store(graphname):

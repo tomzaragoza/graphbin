@@ -2,8 +2,10 @@ var shift_f = false;
 var shift_t = false;
 var shift_delete = false;
 // use this to grab the graph name being loaded
-var pathname = window.location.pathname;
-console.log(pathname);
+var pathname = window.location.pathname.split('/');
+var graphname = pathname[pathname.length -1];
+console.log(graphname);
+
 /*
 	The Graph mouse operations
 */
@@ -50,7 +52,7 @@ $("#viewport").mousedown(function(e){
 
 				$.ajax({
 					type:"POST",
-					url: "/delete/graph1",
+					url: "/delete/" + graphname,
 					data: params,
 					success: function(data) {
 						console.log("sucessfully deleted");
@@ -85,7 +87,7 @@ $("#viewport").mouseup(function(e) {
 
 		$.ajax({
 				type: "POST",
-				url: "/store/graph1",
+				url: "/store/" + graphname,
 				data: params,
 				success: function(data) {
 					console.log(data);
@@ -99,7 +101,7 @@ $("#viewport").mouseup(function(e) {
 	The Graph keydown operations
 */
 $("#viewport").keydown(function(e){
-	console.log("keydown on viewport");
+
 	if(e.shiftKey && e.keyCode == 70){
 		shift_f = true;
 	} else if(e.shiftKey && e.keyCode == 84){
@@ -213,7 +215,7 @@ $("#addNode").click(function(e) {
 					};
 		$.ajax({
 				type: "POST",
-				url: "/store/graph1",
+				url: "/store/" + graphname,
 				data: params,
 				success: function(data) {
 					console.log(data);
@@ -240,7 +242,7 @@ $("#addEdge").click(function(e) {
 			};
 		$.ajax({
 				type: "POST",
-				url: "/store/graph1",
+				url: "/store/" + graphname,
 				data: params,
 				success: function(data) {
 					console.log(data);
