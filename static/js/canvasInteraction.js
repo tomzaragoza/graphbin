@@ -127,6 +127,8 @@ $("#addNode").click(function(e) {
 	}
 
 	if (canCreateNode) {
+		$("#node-label").val('');
+		$("#node-name").val('');
 		var xCoord = -6.0;
 		var yCoord = -8.0;
 		var data = {	
