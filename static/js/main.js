@@ -36,7 +36,7 @@ function persistentAddNode(sys, graphName, nodeName, params) {
 	params['y'] = newNode.p.y;
 	params['node_name'] = nodeName;
 	params['type'] = 'node';
-	console.log(params);
+	// console.log(params);
 	$.ajax({
 			type: "POST",
 			url: '/store/' + graphName,
@@ -59,14 +59,14 @@ function loadGraph(sys, graphName) {
 		success: function(data) {
 			// Load the nodes in their place
 			var nodes = data.nodes;
-			console.log(nodes);
+			// console.log(nodes);
 			for (var i = 0; i < nodes.length; i++) {
 				sys.addNode(nodes[i].node_name, nodes[i]);
 			}
 
 			// Load the edges in their place
 			var edges = data.edges;
-			console.log(edges);
+			// console.log(edges);
 			for (var j = 0; j < edges.length; j++) {
 				sys.addEdge(edges[j].source, edges[j].target);
 			}

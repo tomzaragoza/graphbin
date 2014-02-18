@@ -120,33 +120,42 @@ $("#newNode").click(function(e) {
 	if (nodeName === '' || ~nodeName.indexOf(',')) {
 		alert("Incorrect node name: must not contain commas or be empty");
 		// if the same name as another node, it will update it.
-	}
-	if (nodeLabel === '') {
+	} else if (nodeLabel === '') {
 		alert("Incorrect node label: must not be empty");
+	} else {
+		canCreateNode = true; // passed the two tests above
 	}
 
-	canCreateNode = true; // passed the two tests above
-	var data = {"x":-6.0, "y":-8.0, "mass": 50, "color": "black", "shape": "dot", "label": nodeLabel, "fixed": true};
-	var newNode = sys.addNode(nodeName, data);
-	// Until i figure out how to
-	var params = {
-					'label': nodeLabel,
-					'color': "black",
-					'shape': "dot",
-					'node_name': nodeName,
-					'type': 'node',
-					'x': data.x,
-					'y': data.y,
-				};
+	if (canCreateNode) {
+		var data = {	"x":-6.0, 
+						"y":-8.0, 
+						"mass": 50, 
+						"color": "black", 
+						"shape": "dot", 
+						"label": nodeLabel, 
+						"fixed": true
+					};
+		var newNode = sys.addNode(nodeName, data);
+		// Until i figure out how to get points from node
+		var params = {
+						'label': nodeLabel,
+						'color': "black",
+						'shape': "dot",
+						'node_name': nodeName,
+						'type': 'node',
+						'x': data.x,
+						'y': data.y,
+					};
 
-	$.ajax({
-			type: "POST",
-			url: "/store/graph1",
-			data: params,
-			success: function(data) {
-				console.log(data);
-			}
-	});
+		$.ajax({
+				type: "POST",
+				url: "/store/graph1",
+				data: params,
+				success: function(data) {
+					console.log(data);
+				}
+		});
+	}
 });
 
 $("#addEdge").click(function(e) {
