@@ -2,6 +2,9 @@ var shift_f = false;
 var shift_t = false;
 var shift_delete = false;
 
+/*
+	The Graph mouse operations
+*/
 $("#viewport").mousedown(function(e){
 	// Will need graphname
 	var pos = $(this).offset();
@@ -51,6 +54,7 @@ $("#viewport").mousedown(function(e){
 						console.log("sucessfully deleted");
 					}
 				});
+
 				e.preventDefault();
 			} else {
 				console.log("do not delete the node");
@@ -89,42 +93,9 @@ $("#viewport").mouseup(function(e) {
 		e.preventDefault();
 });
 
-$("#clearNodes").click(function() {
-	$("#viewport").focus();
-	$("#source").empty();
-	$("#target").empty();
-});
-
-
-$("#saveGraph").click(function() {
-	var canvas = document.getElementById("#viewport");
-	var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-	console.log("saving canvas");
-	window.location.href = image;
-});
 /*
-	Node selection for adding edges
+	The Graph keydown operations
 */
-
-var graphFocus = function () {
-	$("#viewport").attr("tabindex", "0");
-	$("#viewport").focus();
-};
-
-$("#selectionMode").click(function(e) {
-	if ($(this).attr("class").indexOf("btn-primary") !== -1) { // contains
-		$(this).removeClass("btn-primary")
-				.addClass("btn-danger")
-				.html("Done selecting");
-	} else {
-		$(this).removeClass("btn-danger")
-				.addClass("btn-primary")
-				.html("Selection mode");
-		$(document).focus();
-	}
-	graphFocus();
-});
-
 $("#viewport").keydown(function(e){
 	console.log("keydown on viewport");
 	if(e.shiftKey && e.keyCode == 70){
@@ -142,6 +113,60 @@ $("#viewport").keyup(function (e) {
 	shift_t = false;
 	shift_delete = false;
 });
+
+
+$("#clearNodes").click(function() {
+	$("#viewport").focus();
+	$("#source").empty();
+	$("#target").empty();
+});
+
+
+$("#saveGraph").click(function() {
+	var canvas = document.getElementById("#viewport");
+	var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+	console.log("saving canvas");
+	window.location.href = image;
+});
+
+
+/*
+	Node selection for adding edges
+*/
+function selectionToRed() {
+	$("#selectionMode").removeClass("btn-primary")
+				.addClass("btn-danger")
+				.html("Done selecting");
+	graphFocus();
+}
+
+function selectionToBlue() {
+	$("#selectionMode").removeClass("btn-danger")
+				.addClass("btn-primary")
+				.html("Selection mode");
+	
+}
+
+$("#viewport").focusout(function(e) {
+	e.stopPropagation();
+	selectionToBlue();
+
+});
+
+var graphFocus = function () {
+	$("#viewport").attr("tabindex", "0");
+	$("#viewport").focus();
+};
+
+
+$("#selectionMode").click(function(e) {
+	if ($("#selectionMode").attr("class").indexOf("btn-primary") !== -1) { // contains
+		selectionToRed();
+	} else {
+		selectionToBlue();
+	}
+});
+
 
 $("#addNode").click(function(e) {
 
@@ -161,8 +186,8 @@ $("#addNode").click(function(e) {
 	if (canCreateNode) {
 		$("#node-label").val('');
 		$("#node-name").val('');
-		var xCoord = -6.0;
-		var yCoord = -8.0;
+		var xCoord = -10.0;
+		var yCoord = -10.0;
 		var data = {	
 						"x": xCoord,
 						"y": yCoord,
@@ -224,6 +249,6 @@ $("#addEdge").click(function(e) {
 		e.preventDefault();
 	} else {
 		alert("Please select two appropriate nodes to add an edge to.");
-		graphFocus();
+		selectionToRed();
 	}
 });
