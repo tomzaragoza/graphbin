@@ -111,7 +111,7 @@ $("#viewport").keyup(function (e) {
 	shift_delete = false;
 });
 
-$("#newNode").click(function(e) {
+$("#addNode").click(function(e) {
 
 	var nodeLabel = $("#node-label").val();
 	var nodeName = $("#node-name").val();
@@ -127,8 +127,11 @@ $("#newNode").click(function(e) {
 	}
 
 	if (canCreateNode) {
-		var data = {	"x":-6.0,
-						"y":-8.0,
+		var xCoord = -6.0;
+		var yCoord = -8.0;
+		var data = {	
+						"x": xCoord,
+						"y": yCoord,
 						"mass": 50,
 						"color": "black",
 						"shape": "dot",
@@ -143,10 +146,9 @@ $("#newNode").click(function(e) {
 						'shape': "dot",
 						'node_name': nodeName,
 						'type': 'node',
-						'x': data.x,
-						'y': data.y,
+						'x': xCoord,
+						'y': yCoord
 					};
-
 		$.ajax({
 				type: "POST",
 				url: "/store/graph1",
