@@ -95,13 +95,13 @@ $("#viewport").mouseup(function(e) {
 */
 $("#selectionMode").click(function(e) {
 	if ($(this).attr("class").indexOf("btn-primary") !== -1) { // contains
-		$(this).removeClass("btn-primary");
-		$(this).addClass("btn-danger");
-		$(this).html("Done selecting");
+		$(this).removeClass("btn-primary")
+				.addClass("btn-danger")
+				.html("Done selecting");
 	} else {
-		$(this).removeClass("btn-danger");
-		$(this).addClass("btn-primary");
-		$(this).html("Selection mode");
+		$(this).removeClass("btn-danger")
+				.addClass("btn-primary")
+				.html("Selection mode");
 		$(document).focus();
 	}
 	$("#viewport").attr("tabindex", "0");
