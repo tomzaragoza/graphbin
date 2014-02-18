@@ -89,10 +89,28 @@ $("#viewport").mouseup(function(e) {
 		e.preventDefault();
 });
 
+$("#clearNodes").click(function() {
+	$("#viewport").focus();
+	$("#source").empty();
+	$("#target").empty();
+});
 
+
+$("#saveGraph").click(function() {
+	var canvas = document.getElementById("#viewport");
+	var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+	console.log("saving canvas");
+	window.location.href = image;
+});
 /*
 	Node selection for adding edges
 */
+
+var graphFocus = function () {
+	$("#viewport").attr("tabindex", "0");
+	$("#viewport").focus();
+};
+
 $("#selectionMode").click(function(e) {
 	if ($(this).attr("class").indexOf("btn-primary") !== -1) { // contains
 		$(this).removeClass("btn-primary")
@@ -104,8 +122,7 @@ $("#selectionMode").click(function(e) {
 				.html("Selection mode");
 		$(document).focus();
 	}
-	$("#viewport").attr("tabindex", "0");
-	$("#viewport").focus();
+	graphFocus();
 });
 
 $("#viewport").keydown(function(e){
@@ -155,6 +172,7 @@ $("#addNode").click(function(e) {
 						"label": nodeLabel,
 						"fixed": true
 					};
+
 		var newNode = sys.addNode(nodeName, data);
 		// Until i figure out how to get points from node
 		var params = {
@@ -206,5 +224,6 @@ $("#addEdge").click(function(e) {
 		e.preventDefault();
 	} else {
 		alert("Please select two appropriate nodes to add an edge to.");
+		graphFocus();
 	}
 });
