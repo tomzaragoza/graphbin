@@ -1,7 +1,9 @@
 var shift_f = false;
 var shift_t = false;
 var shift_delete = false;
-
+// use this to grab the graph name being loaded
+var pathname = window.location.pathname;
+console.log(pathname);
 /*
 	The Graph mouse operations
 */
@@ -10,7 +12,7 @@ $("#viewport").mousedown(function(e){
 	var pos = $(this).offset();
 	var p = {x:e.pageX-pos.left, y:e.pageY-pos.top};
 	nearestNode = sys.nearest(p);
-	// console.log(nearestNode.point);
+
 	if (nearestNode.node !== null && nearestNode.distance < 15){
 
 		if (shift_f === true) {

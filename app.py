@@ -30,6 +30,10 @@ def dbSetup():
 def index():
 	return render_template('index.html')
 
+@app.route('/graph/<graphname>')
+def graph():
+	return render_template('index.html')
+
 @app.route('/store/<graphname>', methods=["POST"])
 def store(graphname):
 	""" 
@@ -142,6 +146,8 @@ def delete(graphname):
 	r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).delete().run()
 
 	return "succesfully deleted node {0} and its edges".format(node_name)
+
+
 if __name__ == '__main__':
 	SETUPDB = True
 	if SETUPDB:
