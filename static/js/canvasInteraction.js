@@ -7,7 +7,7 @@ $("#viewport").mousedown(function(e){
 	var pos = $(this).offset();
 	var p = {x:e.pageX-pos.left, y:e.pageY-pos.top};
 	nearestNode = sys.nearest(p);
-
+	// console.log(nearestNode.point);
 	if (nearestNode.node !== null && nearestNode.distance < 15){
 
 		if (shift_f === true) {
@@ -66,7 +66,7 @@ $("#viewport").mouseup(function(e) {
 	nearestNode = sys.nearest(p);
 	
 	if (nearestNode.node !== null){
-		console.log(nearestNode.node);
+
 		var params = {
 						'label': nearestNode.node.data.label,
 						'color': nearestNode.node.data.color,
@@ -76,6 +76,7 @@ $("#viewport").mouseup(function(e) {
 						'x': nearestNode.node.p.x,
 						'y': nearestNode.node.p.y
 				};
+
 		$.ajax({
 				type: "POST",
 				url: "/store/graph1",
@@ -111,39 +112,33 @@ $("#viewport").keyup(function (e) {
 });
 
 $("#newNode").click(function(e) {
-	console.log("new node!");
-	// Get nodes from database
-	// insert the node information into the database
+
 	var nodeLabel = $("#node-label").val();
 	var nodeName = $("#node-name").val();
 	var canCreateNode = false;
 
 	if (nodeName === '' || ~nodeName.indexOf(',')) {
 		alert("Incorrect node name: must not contain commas or be empty");
-		// also check if it is unique
+		// if the same name as another node, it will update it.
 	}
 	if (nodeLabel === '') {
 		alert("Incorrect node label: must not be empty");
 	}
 
 	canCreateNode = true; // passed the two tests above
-
-	var newNode = sys.addNode(nodeName, {"mass": 50, "color": "black", "shape": "dot", "label": nodeLabel, "fixed": true});
-	var point = newNode.p;
-	console.log(point);
-	// console.log(newNode);
-	// console.log(newNode._p.x);
-	// console.log(newNode._p.y);
+	var data = {"x":-6.0, "y":-8.0, "mass": 50, "color": "black", "shape": "dot", "label": nodeLabel, "fixed": true};
+	var newNode = sys.addNode(nodeName, data);
+	// Until i figure out how to
 	var params = {
 					'label': nodeLabel,
 					'color': "black",
 					'shape': "dot",
 					'node_name': nodeName,
 					'type': 'node',
-					'x': newNode.p.x,
-					'y': newNode.p.y,
-					'p': point
+					'x': data.x,
+					'y': data.y,
 				};
+
 	$.ajax({
 			type: "POST",
 			url: "/store/graph1",

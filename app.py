@@ -46,8 +46,6 @@ def store(graphname):
 		graph_obj_type = request.form["type"]
 		x = request.form["x"]
 		y = request.form["y"]
-		p = request.form["p"]
-		print p
 
 		node_info = {
 						"label": label,
@@ -55,20 +53,19 @@ def store(graphname):
 						"shape": shape,
 						"node_name": node_name,
 						"type": graph_obj_type,
-						"mass": 45,
+						"mass": 50,
 						"fixed": True,
 						"x": x, 
 						"y": y
 					}
 
-		# cursor = r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).run()
-		# if len(list(cursor)) == 0:
-		# 	print "Insert node {0}".format(node_name)
-		# 	r.db(DB_NAME).table(graphname).insert(node_info).run()
-		# else:
-		# 	print "Update node {0}".format(node_name)
-		# 	r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).update(node_info).run()
-		print 'dont insert for now'
+		cursor = r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).run()
+		if len(list(cursor)) == 0:
+			print "Insert node {0}".format(node_name)
+			r.db(DB_NAME).table(graphname).insert(node_info).run()
+		else:
+			print "Update node {0}".format(node_name)
+			r.db(DB_NAME).table(graphname).filter(r.row["node_name"] == node_name).update(node_info).run()
 
 		# Printing out all the documents in the table
 		# cursor = r.db(DB_NAME).table(graphname).run()
