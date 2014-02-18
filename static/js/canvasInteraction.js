@@ -127,12 +127,12 @@ $("#newNode").click(function(e) {
 	}
 
 	if (canCreateNode) {
-		var data = {	"x":-6.0, 
-						"y":-8.0, 
-						"mass": 50, 
-						"color": "black", 
-						"shape": "dot", 
-						"label": nodeLabel, 
+		var data = {	"x":-6.0,
+						"y":-8.0,
+						"mass": 50,
+						"color": "black",
+						"shape": "dot",
+						"label": nodeLabel,
 						"fixed": true
 					};
 		var newNode = sys.addNode(nodeName, data);
