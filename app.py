@@ -46,21 +46,35 @@ def dbSetup():
 # -------------
 # Login stuff
 # -------------
-
 @app.before_request
 def before_request():
 	g.user = current_user
 
 def load_user_from_db(user_object):
 	user = User()
+	user.user_id = user_object['user_id']
+	user.username = user_object['username']
+	user.password = user_object['password']
+	user.email = user_object['email']
+	user.site_id = user_object['site_id']
+	user = User()
 	return user
 
 
 @login_manager.user_loader
 def load_user(userid):
-    return User.get(userid)
+	# return User.get(userid)
+	
+	user_object = r.db(DB_USERS).table(userid).get(userid)#.local.users.find_one({ 'user_id': userid })
+	user_session_object = load_user_from_db(user_object)
+
+	if not type(user_object) is None and not type(user_session_object) is None:
+		return user_session_object#.get_id()
 
 
+# -------------------------
+# Login and Register views
+# -------------------------
 @app.route('/register', methods=['POST', 'GET'])
 def register():
 
@@ -69,24 +83,30 @@ def register():
 		hashed_email = unicode(hash_email(form['email']))
 		print form['email']
 		try:
+			#Look into indexes for tables. This doesn't seem to be the best way
+			#to check if a table exists
 
 			r.db(DB_MAIN).table(hashed_email).run() #if runs, name already exists
 			form = RegisterForm(request.form)
 			flash("Email already exists! Try again")
 
 			return render_template('register', form=form)
-		except RqlRuntimeError:
+		except RqlRuntimeError: # Does not exist, gives error above, thus we can make user
 
 			r.db(DB_USERS).table_create(hashed_email).run()
+			r.db(DB_USERS).table(hashed_email).index_create("site_id").run()
+			r.db(DB_USERS).table(hashed_email).index_wait("site_id").run()
 
-			# Does not exist, gives error above, thus we can make user
 			new_user = {}
 			new_user['email'] = form['email']
+			new_user['user_id'] = form['email']
 			new_user['password'] = hash_password(form['email'], form['password'])
 			new_user['site_id'] = hashed_email # just the email hashed
 
 			r.db(DB_USERS).table(new_user['site_id']).insert(new_user).run()
 			r.db(DB_MAIN).table_create(new_user['site_id']).run() #associated with site_id in DB_USERS
+			r.db(DB_MAIN).table(new_user['site_id']).index_create("site_id").run()
+			r.db(DB_MAIN).table(new_user['site_id']).index_wait("site_id").run()
 			flash('Thanks for registering! Wanna login?')
 
 			return redirect(url_for('login'))
@@ -100,40 +120,50 @@ def login():
 
 	if request.method == 'POST':
 		form = request.form
-		
-		if mongo.local.users.find_one({'username': form['name']}):
-			user_object = mongo.local.users.find_one({'username': form['name']})
-			password = hash_password(form['name'], form['password'])
+		hashed_email = unicode(hash_email(form['email']))
 
-			if password == user_object['password']: # the hashed version of password
-				# convert user data into a Flask-Login usable User object
+		try:
+			print "in the try for login"
+			# if run, name already exists
+			user_object = None
+			user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
+			for d in user_object_cursor:
+				print d
+				user_object = d
+
+			print "after making the user object"
+			entered_password = hash_password(form['email'], form['password'])
+			print "got the entered password"
+			print entered_password
+			print user_object['password']
+			if entered_password == user_object['password']: #check both hashed versions if they match
 				user = User()
-				user.user_id = unicode(hash_email(user_object['username']))
-				user.username = user_object['username']
-				user.password = password
-				user.email = user_object['email']
-				user.site_id = user_object['site_id']
+				user.email = form['email']
+				user.user_id = form['email']
+				user.password = entered_password
+				user.site_id = hashed_email
 
 				login_user(user)
 
-				return redirect(url_for('dashboard'))
+				return redirect(url_for('account'))
 			else:
 				form = LoginForm(request.form)
-				flash('Incorrect username or password! Try again.')
-				return  render_template('forms/login.html', form = form)
-		else: # username doesn't exist
+				print "incorrect username or password! try again"
+				return render_template('login.html', form=form)
+
+		except RqlRuntimeError:
 			form = LoginForm(request.form)
-			flash('Incorrect username or password! Try again.')
-			return render_template('forms/login.html', form = form)
+			print "incorrect username or password! try again"
+			return render_template('login.html', form=form)
+		
 	else:
 		form = LoginForm(request.form)                
 		return render_template('login.html', form = form)
 
 
-# ---------------------
+# --------------------
 # Application Routing
-# ---------------------
-
+# --------------------
 @app.route('/')
 def index():
 	""" 
@@ -143,10 +173,11 @@ def index():
 
 @app.route('/account')
 @login_required
-def user():
+def account():
 	""" 
 		Load the user's graph collection page (account).
 	"""
+	print "yay you're in!"
 	user = 'test@test.com'
 	return render_template('account.html', user = user)
 
