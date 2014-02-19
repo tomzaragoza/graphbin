@@ -33,7 +33,7 @@ def index():
 @app.route('/graph/<graphname>')
 def graph(graphname):
 	try:
-		r.db(DB_NAME).table(graphname + 'fen').run()
+		r.db(DB_NAME).table(graphname).run()
 		return render_template('graph.html')
 	except RqlRuntimeError:
 		return "Error: Graph '{0}'' does not exist".format(graphname)
