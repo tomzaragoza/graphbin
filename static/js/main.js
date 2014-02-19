@@ -11,22 +11,6 @@ function backupNodes() {
 	persistentAddNode(sys, "graph1", "n4", {"x": -1.6054553796477616, "y": -0.318212010897696, "mass": 50, "color": "black", "shape": "dot", "label": "350", "fixed": true});
 	persistentAddNode(sys, "graph1", "n5", {"x": -1.6054553796477616, "y": -0.318212010897696, "mass": 50, "color": "black", "shape": "dot", "label": "150", "fixed": true});
 }
-// backupNodes();
-
-// var data = {
-// 	nodes:{
-// 		n1:{'color':'black','shape':'dot','label':'200', 'mass': 50, 'fixed': true},
-// 		n2:{'color':'black','shape':'dot','label':'100', 'mass': 50, 'fixed': true},
-// 		n3:{'color':'black','shape':'dot','label':'300', 'mass': 50, 'fixed': true},
-// 		n4:{'color':'black','shape':'dot','label':'350', 'mass': 50, 'fixed': true},
-// 		n5:{'color':'black','shape':'dot','label':'150', 'mass': 50, 'fixed': true},
-// 	},
-// 	edges:{
-// 		n1:{ n2:{}, n3:{} },
-// 		n2:{ n5:{} },
-// 		n3:{ n4:{} }
-// 	}
-// };
 
 function persistentAddNode(sys, graphName, nodeName, params) {
 	sys.addNode(nodeName, params);

@@ -5,7 +5,7 @@ var shift_delete = false;
 var pathname = window.location.pathname.split('/');
 var graphname = pathname[pathname.length -1];
 console.log(graphname);
-
+$("#graphname-header").html(graphname);
 /*
 	The Graph mouse operations
 */

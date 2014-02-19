@@ -1,0 +1,10 @@
+
+  <form method="post" class="form" action="{{ url_for('register')}}">
+    <h3 class="form-heading">Register <a href="{{ url_for('index') }}" title="Back to homepage"><i class="icon icon-home pull-right"></i></a></h3>
+    
+    {{ form.email(class_ = 'form-control', placeholder = form.email.label.text, required = true) }}
+    {{ form.password(class_ = 'form-control', placeholder = form.password.label.text, required = true) }}
+    {{ form.confirm(class_ = 'form-control last-input', placeholder = form.confirm.label.text, required = true) }}
+    <p class="pull-left"><a href="{{ url_for('login') }}">Login</a></p>
+    <input type="submit" value="Register" class="btn btn-primary btn-lg btn-block">
+  </form>
