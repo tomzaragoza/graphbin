@@ -1,11 +1,14 @@
 var shift_f = false;
 var shift_t = false;
 var shift_delete = false;
+
 // use this to grab the graph name being loaded
 var pathname = window.location.pathname.split('/');
 var graphname = pathname[pathname.length -1];
 console.log(graphname);
 $("#graphname-header").html(graphname);
+
+
 /*
 	The Graph mouse operations
 */
@@ -125,7 +128,6 @@ $("#clearNodes").click(function() {
 	$("#target").empty();
 });
 
-
 $("#saveGraph").click(function() {
 	var canvas = document.getElementById("#viewport");
 	var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
@@ -138,10 +140,14 @@ $("#saveGraph").click(function() {
 	Node selection for adding edges
 */
 
-$("#viewport").focusout(function(e) {
-	e.stopPropagation();
-	// selectionToBlue();
-	// $("#selectionMode").trigger("click");
+$(document).click(function(e) {
+	// To return to blue button and unfocus
+	// when clicking anywhere on the document.
+	var graphDistance = $(e.target).closest('#viewport').length;
+	var selectionModeDistance = $(e.target).closest('#selectionMode').length;
+    if (graphDistance === 0 && selectionModeDistance === 0) {
+        selectionToBlue();
+    }
 });
 
 var graphFocus = function () {
@@ -158,17 +164,15 @@ function selectionToRed() {
 
 function selectionToBlue() {
 	$("#selectionMode").removeClass("btn-danger")
-				.addClass("btn-primary")
-				.html("Selection mode");
-	
+			.addClass("btn-primary")
+			.html("Selection mode");
 }
 
 $("#selectionMode").click(function(e) {
-	if ($("#selectionMode").attr("class").indexOf("btn-primary") !== -1) { // contains
-		console.log("going red");
+	if ($("#selectionMode").attr("class").indexOf("btn-primary") !== -1) { 
+		// contains btn-primary
 		selectionToRed();
 	} else {
-		console.log("going blue");
 		selectionToBlue();
 	}
 });
