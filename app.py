@@ -325,9 +325,9 @@ def delete(graphname):
 	edges_to_delete = request.form["edges_to_delete"].split(',')
 
 	for edge_name in edges_to_delete:
-		r.db(DB_MAIN).table(graphname).filter(r.row["edge_name"] == edge_name).delete().run()
+		r.db(current_user['site_id']).table(graphname).filter(r.row["edge_name"] == edge_name).delete().run()
 
-	r.db(DB_MAIN).table(graphname).filter(r.row["node_name"] == node_name).delete().run()
+	r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).delete().run()
 
 	return "succesfully deleted node {0} and its edges".format(node_name)
 

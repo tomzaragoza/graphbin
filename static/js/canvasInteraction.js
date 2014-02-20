@@ -137,6 +137,18 @@ $("#saveGraph").click(function() {
 /*
 	Node selection for adding edges
 */
+
+$("#viewport").focusout(function(e) {
+	e.stopPropagation();
+	// selectionToBlue();
+	// $("#selectionMode").trigger("click");
+});
+
+var graphFocus = function () {
+	$("#viewport").attr("tabindex", "0");
+	$("#viewport").focus();
+};
+
 function selectionToRed() {
 	$("#selectionMode").removeClass("btn-primary")
 				.addClass("btn-danger")
@@ -151,22 +163,12 @@ function selectionToBlue() {
 	
 }
 
-$("#viewport").focusout(function(e) {
-	e.stopPropagation();
-	selectionToBlue();
-
-});
-
-var graphFocus = function () {
-	$("#viewport").attr("tabindex", "0");
-	$("#viewport").focus();
-};
-
-
 $("#selectionMode").click(function(e) {
 	if ($("#selectionMode").attr("class").indexOf("btn-primary") !== -1) { // contains
+		console.log("going red");
 		selectionToRed();
 	} else {
+		console.log("going blue");
 		selectionToBlue();
 	}
 });
@@ -190,8 +192,8 @@ $("#addNode").click(function(e) {
 	if (canCreateNode) {
 		$("#node-label").val('');
 		$("#node-name").val('');
-		var xCoord = -10.0;
-		var yCoord = -10.0;
+		var xCoord = -6.0;
+		var yCoord = -7.0;
 		var data = {	
 						"x": xCoord,
 						"y": yCoord,
