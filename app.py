@@ -147,6 +147,7 @@ def login():
 			else:
 				form = LoginForm(request.form)
 				print "incorrect username or password! try again"
+				flash("aww ye")
 				return render_template('login.html', form=form)
 
 		except RqlRuntimeError:
@@ -219,6 +220,11 @@ def graph(graphname):
 	except RqlRuntimeError:
 		return "Error: Graph '{0}'' does not exist".format(graphname)
 
+@app.route('/graph/settings/<graphname>')
+@login_required
+def graph_settings(graphname):
+	""" Load settings page for a particular graph """
+	pass
 
 @app.route('/store/<graphname>', methods=["POST"])
 @login_required

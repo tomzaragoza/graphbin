@@ -6,20 +6,34 @@
 	</head>
 	<body>
 		<div class="container" style="padding-top: 50px;">
+		<header>
 			<h1>GraphBin <small>Your Saved Graphs</small>
 				<a class="btn btn-default pull-right" href="/logout">Logout</a>
 			</h1> 
+		</header>
 			<div class="col-lg-4">
+				<div class="col-lg-15">
+				{% for graph in all_graphs %}
+					<h3>
+						<a href="/graph/{{graph}}">{{graph}}</a> 
+						<a class="btn btn-default pull-right" href="#">
+							<span class="glyphicon glyphicon-cog"></span>
+						</a>
+						<a class="btn btn-default pull-right" href="#">
+							<span class="glyphicon glyphicon-trash"></span>
+						</a>
+					</h3>
+				{% endfor %}
+				</div>
+			</div>
+
+			<div class="col-lg-4 pull-right">
 				<div class="input-group">
 					<input type="text" class="form-control" maxlength="15" id="createGraphInput">
 					<span class="input-group-btn">
 						<button class="btn btn-default" id="createGraphButton">Create New Graph</button>
 					</span>
 				</div>
-				<br>
-				{% for graph in all_graphs %}
-				<p><a href="/graph/{{graph}}">{{graph}}</a></p>
-				{% endfor %}
 			</div>
 			<script type="text/javascript" src="/static/js/account.js"></script>
 		</div>

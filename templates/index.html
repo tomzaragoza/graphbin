@@ -10,9 +10,11 @@
 		<body>
 			<div class="container" style="padding-top: 50px;">
 				<h1> GraphBin <small>Home</small></h1>
+
+				<h3>Create your own graphs online for free. Login or Register below.</h3>
 				{% if not logged_in %}
-				<p><a href="/login">Login</a></p>
-				<p><a href="/register">Register</a></p>
+				<p><a class="btn btn-default" href="/login">Login</a></p>
+				<p><a class="btn btn-default" href="/register">Register</a></p>
 				{% else %}
 				<p><a href="/account">Your Account</a></p>
 				{% endif %}
