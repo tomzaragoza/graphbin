@@ -6,7 +6,9 @@
 		</head>
 		<body>
 			<div class="container" style="padding-top: 50px;">
-				<h1>GraphBin <small>Your Saved Graphs</small></h1> 
+				<h1>GraphBin <small>Your Saved Graphs</small>
+					<a class="btn btn-default pull-right" href="/logout">Logout</a>
+				</h1> 
 				<div class="col-lg-4">
 					<div class="input-group">
 						<input type="text" class="form-control" id="createGraphInput">
@@ -14,6 +16,10 @@
 							<button class="btn btn-default" id="createGraphButton">Create New Graph</button>
 						</span>
 					</div>
+					<br>
+					{% for graph in all_graphs %}
+					<p><a href="/graph/{{graph}}">{{graph}}</a></p>
+					{% endfor %}
 				</div>
 				<script type="text/javascript" src="/static/js/account.js"></script>
 			</div>

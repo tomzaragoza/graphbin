@@ -79,7 +79,7 @@ def load_user(userid):
 
 
 # -------------------------
-# Login and Register views
+# Login, Logout, Register views
 # -------------------------
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -157,6 +157,12 @@ def login():
 		form = LoginForm(request.form)                
 		return render_template('login.html', form = form)
 
+@app.route('/logout')
+@login_required   
+def logout():
+	logout_user()
+	flash('See ya later!')
+	return redirect(url_for('login'))
 
 # --------------------
 # Application Routing
@@ -174,10 +180,12 @@ def account():
 	""" 
 		Load the user's graph collection page (account).
 	"""
+	all_graphs = r.db(current_user['site_id']).table_list().run()
+	print all_graphs
 	# Load all the user's graphs into an array
 	# pass array to account.html
 	# load the list of graphs on the page via Jinja
-	return render_template('account.html')
+	return render_template('account.html', all_graphs=all_graphs)
 
 @app.route('/create_graph/<graphname>', methods=["POST"])
 @login_required
@@ -192,7 +200,6 @@ def check_graph(graphname):
 	""" 
 		Loads the graph page.
 	"""
-
 	try:
 		r.db(current_user['site_id']).table(graphname).run() # if this runs, graphname exists
 		return jsonify(exists=True)
