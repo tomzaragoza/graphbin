@@ -109,9 +109,10 @@ def register():
 			return redirect(url_for('login'))
 		except RqlRuntimeError: 
 			form = RegisterForm(request.form)
+			print "Email already exists?"
 			flash("Email already exists! Try again")
 
-			return render_template('register', form=form)
+			return render_template('register.html', form=form)
 
 	elif request.method == 'GET':
 		form = RegisterForm(request.form)
