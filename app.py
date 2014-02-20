@@ -173,7 +173,29 @@ def account():
 	""" 
 		Load the user's graph collection page (account).
 	"""
-	return render_template('account.html', user = current_user['email'])
+	# Load all the user's graphs into an array
+	# pass array to account.html
+	# load the list of graphs on the page via Jinja
+	return render_template('account.html')
+
+@app.route('/create_graph/<graphname>')
+@login_required
+def create_graph(graphname):
+	""" Create the graph with the given graphname"""
+	pass
+
+@app.route('/check_graph/<graphname>')
+@login_required
+def check_graph(graphname):
+	""" 
+		Loads the graph page.
+	"""
+	try:
+		r.db(DB_MAIN).table(graphname).run() # if this runs, graphname exists
+		return True
+	except RqlRuntimeError:
+		return False
+
 
 @app.route('/graph/<graphname>')
 @login_required
@@ -186,6 +208,7 @@ def graph(graphname):
 		return render_template('graph.html')
 	except RqlRuntimeError:
 		return "Error: Graph '{0}'' does not exist".format(graphname)
+
 
 @app.route('/store/<graphname>', methods=["POST"])
 @login_required
