@@ -53,22 +53,24 @@ def before_request():
 def load_user_from_db(user_object):
 	user = User()
 	user.user_id = user_object['user_id']
-	user.username = user_object['username']
 	user.password = user_object['password']
 	user.email = user_object['email']
 	user.site_id = user_object['site_id']
-	user = User()
 	return user
 
 
 @login_manager.user_loader
 def load_user(userid):
-	# return User.get(userid)
-	
-	user_object = r.db(DB_USERS).table(userid).get(userid)#.local.users.find_one({ 'user_id': userid })
+	user_object = None
+	hashed_email = hash_email(userid)
+
+	user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
+	for doc in user_object_cursor:
+		user_object = doc
+
 	user_session_object = load_user_from_db(user_object)
 
-	if not type(user_object) is None and not type(user_session_object) is None:
+	if type(user_object) != None and type(user_session_object) != None:
 		return user_session_object#.get_id()
 
 
@@ -81,7 +83,7 @@ def register():
 	if request.method == 'POST':
 		form = request.form
 		hashed_email = unicode(hash_email(form['email']))
-		print form['email']
+
 		try:
 			#Look into indexes for tables. This doesn't seem to be the best way
 			#to check if a table exists
@@ -123,19 +125,13 @@ def login():
 		hashed_email = unicode(hash_email(form['email']))
 
 		try:
-			print "in the try for login"
 			# if run, name already exists
 			user_object = None
 			user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
 			for d in user_object_cursor:
-				print d
 				user_object = d
 
-			print "after making the user object"
 			entered_password = hash_password(form['email'], form['password'])
-			print "got the entered password"
-			print entered_password
-			print user_object['password']
 			if entered_password == user_object['password']: #check both hashed versions if they match
 				user = User()
 				user.email = form['email']
@@ -169,7 +165,7 @@ def index():
 	""" 
 		Loading and serving the home page of GraphBin. 
 	"""
-	return render_template('index.html')
+	return render_template('index.html', logged_in = current_user.is_authenticated())
 
 @app.route('/account')
 @login_required
@@ -177,9 +173,7 @@ def account():
 	""" 
 		Load the user's graph collection page (account).
 	"""
-	print "yay you're in!"
-	user = 'test@test.com'
-	return render_template('account.html', user = user)
+	return render_template('account.html', user = current_user['email'])
 
 @app.route('/graph/<graphname>')
 @login_required

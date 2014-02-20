@@ -1,5 +1,5 @@
 from schematics.models import Model
-from schematics.types import StringType, URLType, FloatType
+from schematics.types import StringType
 
 class User(Model):
 	user_id = StringType(required=True)
@@ -21,4 +21,4 @@ class User(Model):
 		return unicode(self.user_id)
 
 	def __repr__(self):
-		return '<User %r>' & (self.username)
+		return '<User {0}>'.format(self.email)
