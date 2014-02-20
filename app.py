@@ -104,9 +104,6 @@ def register():
 			r.db(DB_USERS).table(hashed_email).index_create("site_id").run()
 			r.db(DB_USERS).table(hashed_email).index_wait("site_id").run()
 
-			# r.db(hashed_email).table_create(new_user['site_id']).run() #associated with site_id in DB_USERS
-			# r.db(hashed_email).table(new_user['site_id']).index_create("site_id").run()
-			# r.db(hashed_email).table(new_user['site_id']).index_wait("site_id").run()
 			flash('Thanks for registering! Wanna login?')
 
 			return redirect(url_for('login'))
