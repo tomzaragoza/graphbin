@@ -128,11 +128,16 @@ $("#clearNodes").click(function() {
 	$("#target").empty();
 });
 
-$("#saveGraph").click(function() {
-	var canvas = document.getElementById("#viewport");
-	var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-	console.log("saving canvas");
-	window.location.href = image;
+$("#exportGraph").click(function() {
+	var canvas = document.getElementById("viewport");
+	var ctx = canvas.getContext("2d");
+	// var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+	// var canvas = document.getElementById("my-canvas"), ctx = canvas.getContext("2d");
+	// draw to canvas...
+	canvas.toBlob(function(blob) {
+		saveAs(blob, "pretty image.png");
+	});
+	// window.location.href = image;
 });
 
 
