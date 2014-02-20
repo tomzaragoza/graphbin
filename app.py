@@ -179,23 +179,25 @@ def account():
 	# load the list of graphs on the page via Jinja
 	return render_template('account.html')
 
-@app.route('/create_graph/<graphname>')
+@app.route('/create_graph/<graphname>', methods=["POST"])
 @login_required
 def create_graph(graphname):
 	""" Create the graph with the given graphname"""
-	pass
+	r.db(current_user['site_id']).table_create(graphname).run()
+	return jsonify(exists=True)
 
-@app.route('/check_graph/<graphname>')
+@app.route('/check_graph/<graphname>', methods=["POST"])
 @login_required
 def check_graph(graphname):
 	""" 
 		Loads the graph page.
 	"""
+
 	try:
-		r.db(DB_MAIN).table(graphname).run() # if this runs, graphname exists
-		return True
+		r.db(current_user['site_id']).table(graphname).run() # if this runs, graphname exists
+		return jsonify(exists=True)
 	except RqlRuntimeError:
-		return False
+		return jsonify(exists=False)
 
 
 @app.route('/graph/<graphname>')
@@ -205,7 +207,7 @@ def graph(graphname):
 		Loads the graph page.
 	"""
 	try:
-		r.db(DB_MAIN).table(graphname).run() # if this runs, graphname exists
+		r.db(current_user['site_id']).table(graphname).run() # if this runs, graphname exists
 		return render_template('graph.html')
 	except RqlRuntimeError:
 		return "Error: Graph '{0}'' does not exist".format(graphname)
@@ -241,13 +243,13 @@ def store(graphname):
 						"y": y
 					}
 
-		cursor = r.db(DB_MAIN).table(graphname).filter(r.row["node_name"] == node_name).run()
+		cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).run()
 		if len(list(cursor)) == 0:
 			print "Insert node {0}".format(node_name)
-			r.db(DB_MAIN).table(graphname).insert(node_info).run()
+			r.db(current_user['site_id']).table(graphname).insert(node_info).run()
 		else:
 			print "Update node {0}".format(node_name)
-			r.db(DB_MAIN).table(graphname).filter(r.row["node_name"] == node_name).update(node_info).run()
+			r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).update(node_info).run()
 
 	elif request.form['type'] == 'edge':
 		print "Storing edge to DB..."
@@ -262,13 +264,13 @@ def store(graphname):
 						"type": "edge"
 					}
 
-		cursor = r.db(DB_MAIN).table(graphname).filter(r.row["edge_name"] == edge_name).run()
+		cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["edge_name"] == edge_name).run()
 		if len(list(cursor)) == 0:
 			print "Inserting edge {0}".format(edge_name)
-			r.db(DB_MAIN).table(graphname).insert(edge_info).run()
+			r.db(current_user['site_id']).table(graphname).insert(edge_info).run()
 		else:
 			print "Updating edge {0}".format(edge_name)
-			r.db(DB_MAIN).table(graphname).filter(r.row["edge_name"] == edge_name).update(edge_info).run()
+			r.db(current_user['site_id']).table(graphname).filter(r.row["edge_name"] == edge_name).update(edge_info).run()
 
 
 	return "stored {0} successfully".format(request.form['type'])
@@ -281,7 +283,7 @@ def load(graphname):
 	"""
 
 	all_nodes = []
-	cursor_nodes = r.db(DB_MAIN).table(graphname).filter(r.row["type"] == "node").run()
+	cursor_nodes = r.db(current_user['site_id']).table(graphname).filter(r.row["type"] == "node").run()
 	for d in cursor_nodes:
 		del d['id']
 		d['node_name'] = str(d['node_name'])
@@ -296,7 +298,7 @@ def load(graphname):
 		all_nodes.append(d)
 	
 	all_edges =[]
-	cursor_edge = r.db(DB_MAIN).table(graphname).filter(r.row["type"] == "edge").run()
+	cursor_edge = r.db(current_user['site_id']).table(graphname).filter(r.row["type"] == "edge").run()
 	for d in cursor_edge:
 		del d['id']
 		d['source'] = str(d['source'])

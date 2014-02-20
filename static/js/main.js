@@ -1,3 +1,7 @@
+// use this to grab the graph name being loaded
+var pathname = window.location.pathname.split('/');
+var graphname = pathname[pathname.length -1];
+console.log(graphname);
 
 /* Load the ArborJS environment */
 var sys = arbor.ParticleSystem({repulsion: 0, stiffness:1000, friction: 0.5, gravity: false});
@@ -59,7 +63,7 @@ function loadGraph(sys, graphName) {
 	});
 }
 
-loadGraph(sys, "graph1");
+loadGraph(sys, graphname);
 /*
 	With the given data, draw out the graph
 */
