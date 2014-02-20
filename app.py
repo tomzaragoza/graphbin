@@ -15,6 +15,7 @@ app = Flask(__name__)
 app.secret_key = '8yK6_Mf2D_-R6GB3C1222o1ix98o-YR_'
 
 login_manager = LoginManager()
+login_manager.login_view = "login"
 login_manager.init_app(app)
 
 RDB_HOST =  os.environ.get('RDB_HOST') or 'localhost'
@@ -181,7 +182,6 @@ def account():
 		Load the user's graph collection page (account).
 	"""
 	all_graphs = r.db(current_user['site_id']).table_list().run()
-	print all_graphs
 	# Load all the user's graphs into an array
 	# pass array to account.html
 	# load the list of graphs on the page via Jinja

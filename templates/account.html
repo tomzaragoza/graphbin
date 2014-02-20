@@ -1,27 +1,27 @@
 <html>
-		<head>
-				<script type="text/javascript" src="/static/js/jquery-1.10.2.min.js"></script>
-				<link rel="stylesheet" href="/static/css/bootstrap.min.css"></script>
-				<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-		</head>
-		<body>
-			<div class="container" style="padding-top: 50px;">
-				<h1>GraphBin <small>Your Saved Graphs</small>
-					<a class="btn btn-default pull-right" href="/logout">Logout</a>
-				</h1> 
-				<div class="col-lg-4">
-					<div class="input-group">
-						<input type="text" class="form-control" id="createGraphInput">
-						<span class="input-group-btn">
-							<button class="btn btn-default" id="createGraphButton">Create New Graph</button>
-						</span>
-					</div>
-					<br>
-					{% for graph in all_graphs %}
-					<p><a href="/graph/{{graph}}">{{graph}}</a></p>
-					{% endfor %}
+	<head>
+			<script type="text/javascript" src="/static/js/jquery-1.10.2.min.js"></script>
+			<link rel="stylesheet" href="/static/css/bootstrap.min.css"></script>
+			<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<div class="container" style="padding-top: 50px;">
+			<h1>GraphBin <small>Your Saved Graphs</small>
+				<a class="btn btn-default pull-right" href="/logout">Logout</a>
+			</h1> 
+			<div class="col-lg-4">
+				<div class="input-group">
+					<input type="text" class="form-control" id="createGraphInput">
+					<span class="input-group-btn">
+						<button class="btn btn-default" id="createGraphButton">Create New Graph</button>
+					</span>
 				</div>
-				<script type="text/javascript" src="/static/js/account.js"></script>
+				<br>
+				{% for graph in all_graphs %}
+				<p><a href="/graph/{{graph}}">{{graph}}</a></p>
+				{% endfor %}
 			</div>
-		</body>
+			<script type="text/javascript" src="/static/js/account.js"></script>
+		</div>
+	</body>
 </html>
