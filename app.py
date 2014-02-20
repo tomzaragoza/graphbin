@@ -28,12 +28,16 @@ rethink = r.connect("localhost", 28015).repl()
 # ---------
 def dbSetup():
 	connection = r.connect(host=RDB_HOST, port=RDB_PORT)
-	try:
-		r.db_create(DB_MAIN).run(connection)
-		# r.db(DB_MAIN).table_create('todos').run(connection)
-		print 'Database {0} setup completed. Now run the app without --setup.'.format(DB_MAIN)
-	except RqlRuntimeError:
-		print 'App database {0} already exists. Run the app without --setup.'.format(DB_MAIN)
+
+	# All that matters is that DB_USERS is created
+	# Each account DB will be created after a user logs in.
+
+	# try:
+	# 	r.db_create(DB_MAIN).run(connection)
+	# 	# r.db(DB_MAIN).table_create('todos').run(connection)
+	# 	print 'Database {0} setup completed. Now run the app without --setup.'.format(DB_MAIN)
+	# except RqlRuntimeError:
+	# 	print 'App database {0} already exists. Run the app without --setup.'.format(DB_MAIN)
 
 	try:
 		r.db_create(DB_USERS).run(connection)
@@ -85,19 +89,8 @@ def register():
 		hashed_email = unicode(hash_email(form['email']))
 
 		try:
-			#Look into indexes for tables. This doesn't seem to be the best way
-			#to check if a table exists
-
-			r.db(DB_MAIN).table(hashed_email).run() #if runs, name already exists
-			form = RegisterForm(request.form)
-			flash("Email already exists! Try again")
-
-			return render_template('register', form=form)
-		except RqlRuntimeError: # Does not exist, gives error above, thus we can make user
-
-			r.db(DB_USERS).table_create(hashed_email).run()
-			r.db(DB_USERS).table(hashed_email).index_create("site_id").run()
-			r.db(DB_USERS).table(hashed_email).index_wait("site_id").run()
+			# if this runs, DB already exists with email and we continue on
+			r.db_create(hashed_email).run() # this is where all graphs will be saved
 
 			new_user = {}
 			new_user['email'] = form['email']
@@ -105,13 +98,23 @@ def register():
 			new_user['password'] = hash_password(form['email'], form['password'])
 			new_user['site_id'] = hashed_email # just the email hashed
 
-			r.db(DB_USERS).table(new_user['site_id']).insert(new_user).run()
-			r.db(DB_MAIN).table_create(new_user['site_id']).run() #associated with site_id in DB_USERS
-			r.db(DB_MAIN).table(new_user['site_id']).index_create("site_id").run()
-			r.db(DB_MAIN).table(new_user['site_id']).index_wait("site_id").run()
+			r.db(DB_USERS).table_create(hashed_email).run()
+
+			r.db(DB_USERS).table(hashed_email).insert(new_user).run()
+			r.db(DB_USERS).table(hashed_email).index_create("site_id").run()
+			r.db(DB_USERS).table(hashed_email).index_wait("site_id").run()
+
+			# r.db(hashed_email).table_create(new_user['site_id']).run() #associated with site_id in DB_USERS
+			# r.db(hashed_email).table(new_user['site_id']).index_create("site_id").run()
+			# r.db(hashed_email).table(new_user['site_id']).index_wait("site_id").run()
 			flash('Thanks for registering! Wanna login?')
 
 			return redirect(url_for('login'))
+		except RqlRuntimeError: 
+			form = RegisterForm(request.form)
+			flash("Email already exists! Try again")
+
+			return render_template('register', form=form)
 
 	elif request.method == 'GET':
 		form = RegisterForm(request.form)
