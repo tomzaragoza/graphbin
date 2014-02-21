@@ -288,8 +288,7 @@ def store(graphname):
 		shape = request.form["shape"]
 		node_name = request.form["node_name"]
 		graph_obj_type = request.form["type"]
-		x = request.form["x"]
-		y = request.form["y"]
+
 
 		node_info = {
 						"label": label,
@@ -298,10 +297,13 @@ def store(graphname):
 						"node_name": node_name,
 						"type": graph_obj_type,
 						"mass": 50,
-						"fixed": True,
-						"x": x, 
-						"y": y
+						"fixed": True
 					}
+
+		if "x" in request.form:
+			node_info['x'] = request.form["x"]
+		if "y" in request.form:
+			node_info['y'] = request.form["y"]
 
 		cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).run()
 		if len(list(cursor)) == 0:

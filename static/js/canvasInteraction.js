@@ -1,6 +1,8 @@
 var shift_f = false;
 var shift_t = false;
 var shift_delete = false;
+var shift_e = false;
+var isEditing = false;
 
 // use this to grab the graph name being loaded
 var pathname = window.location.pathname.split('/');
@@ -25,6 +27,12 @@ $("#viewport").mousedown(function(e){
 
 		if (shift_t === true) {
 			$("#target").html(nearestNode.node.name);
+		}
+
+		if (shift_e === true) {
+			isEditing = true;
+			$("#node-label").val(nearestNode.node.data.label);
+			$("#node-name").val(nearestNode.node.name);
 		}
 
 		var edgesFrom = sys.getEdgesFrom(nearestNode.node);
@@ -92,7 +100,6 @@ $("#viewport").mouseup(function(e) {
 				url: "/store/" + graphname,
 				data: params,
 				success: function(data) {
-					console.log(data);
 				}
 		});
 		}
@@ -110,6 +117,8 @@ $("#viewport").keydown(function(e){
 		shift_t = true;
 	} else if (e.shiftKey && e.keyCode == 68) {
 		shift_delete = true;
+	} else if (e.shiftKey && e.keyCode == 69) {
+		shift_e = true;
 	}
 	e.preventDefault();
 });
@@ -118,6 +127,7 @@ $("#viewport").keyup(function (e) {
 	shift_f = false;
 	shift_t = false;
 	shift_delete = false;
+	shift_e = false;
 });
 
 
@@ -180,7 +190,7 @@ $("#selectionMode").click(function(e) {
 });
 
 
-$("#addNode").click(function(e) {
+$("#addOrEditNode").click(function(e) {
 
 	var nodeLabel = $("#node-label").val();
 	var nodeName = $("#node-name").val();
@@ -200,15 +210,19 @@ $("#addNode").click(function(e) {
 		$("#node-name").val('');
 		var xCoord = -6.0;
 		var yCoord = -7.0;
+
 		var data = {
-						"x": xCoord,
-						"y": yCoord,
 						"mass": 50,
 						"color": "black",
 						"shape": "dot",
 						"label": nodeLabel,
 						"fixed": true
 					};
+
+		if (!isEditing) {
+			data['x'] = xCoord;
+			data['y'] = yCoord;
+		}
 
 		var newNode = sys.addNode(nodeName, data);
 		// Until i figure out how to get points from node
@@ -218,15 +232,18 @@ $("#addNode").click(function(e) {
 						'shape': "dot",
 						'node_name': nodeName,
 						'type': 'node',
-						'x': xCoord,
-						'y': yCoord
 					};
+
+		if (!isEditing) {
+			params['x'] = xCoord;
+			params['y'] = yCoord;
+		}
+
 		$.ajax({
 				type: "POST",
 				url: "/store/" + graphname,
 				data: params,
 				success: function(data) {
-					console.log(data);
 				}
 		});
 	}

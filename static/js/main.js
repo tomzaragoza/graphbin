@@ -31,7 +31,6 @@ function persistentAddNode(sys, graphName, nodeName, params) {
 			url: '/store/' + graphName,
 			data: params,
 			success: function(data) {
-				console.log(data);
 			}
 		});
 }
