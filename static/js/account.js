@@ -40,7 +40,7 @@ $("#createGraphButton").click(function(e) {
 
 									$("#response-box").html('<h1><small>Successfully added ' + input + '! </small></h1>');
 									$(thisButton).removeAttr("disabled");
-									$("#response-box").fadeOut(3500, function() {
+									$("#response-box").fadeOut(2700, function() {
 										$(this).empty();
 									});
 								}

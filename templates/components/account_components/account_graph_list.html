@@ -1,13 +1,15 @@
 {% for graph in all_graphs %}
-	<h3>
-		<a href="/graph/{{graph}}">{{graph}}</a> 
-		<button class="btn btn-default pull-right settings" data-graph-name="{{graph}}">
-			<span class="glyphicon glyphicon-cog"></span>
-		</button>
-		<button class="btn btn-default pull-right delete" data-graph-name="{{graph}}">
-			<span class="glyphicon glyphicon-trash"></span>
-		</button>
-	</h3>
+	<div id="{{graph}}-list-item">
+		<h3>
+			<a href="/graph/{{graph}}">{{graph}}</a> 
+			<button class="btn btn-default pull-right settings" data-graph-name="{{graph}}">
+				<span class="glyphicon glyphicon-cog"></span>
+			</button>
+			<button class="btn btn-default pull-right delete" data-graph-name="{{graph}}">
+				<span class="glyphicon glyphicon-trash"></span>
+			</button>
+		</h3>
+	</div>
 {% endfor %}
 
 <script>

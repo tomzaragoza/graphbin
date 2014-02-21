@@ -224,6 +224,12 @@ def delete_graph(graphname):
 	"""
 	if request.method == "GET":
 		return render_template('components/account_components/account_delete_graph.html', graphname=graphname)
+	elif request.method == "POST":
+		try:
+			r.db(current_user['site_id']).table_drop(graphname).run()
+			return jsonify(deleted=True)
+		except RqlRuntimeError:
+			return jsonify(deleted=False)
 
 @app.route('/graph/<graphname>')
 @login_required
