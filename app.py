@@ -176,17 +176,22 @@ def index():
 	"""
 	return render_template('index.html', logged_in = current_user.is_authenticated())
 
+
+@app.route('/load_graph_list', methods=["POST"])
+@login_required
+def load_graph_list():
+	print "wat"
+	all_graphs = r.db(current_user['site_id']).table_list().run()
+	all_graphs.sort()
+	return render_template('components/account_components/account_graph_list.html', all_graphs=all_graphs)
+
 @app.route('/account')
 @login_required
 def account():
 	""" 
 		Load the user's graph collection page (account).
 	"""
-	all_graphs = r.db(current_user['site_id']).table_list().run()
-	# Load all the user's graphs into an array
-	# pass array to account.html
-	# load the list of graphs on the page via Jinja
-	return render_template('account.html', all_graphs=all_graphs)
+	return render_template('account.html')
 
 @app.route('/create_graph/<graphname>', methods=["POST"])
 @login_required

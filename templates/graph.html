@@ -17,28 +17,35 @@
 					<button class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal" id="saveGraph">Save graph</button>
 				</h1>
 				<div id="controls" class="pull-left">
-					<h3> + New Node </h3>
+					<h4> + New Node </h4>
 					<input class="form-control" id="node-label" maxlength="15" placeholder="Node value / key">
 					<input class="form-control" id="node-name" maxlength="15" placeholder="Node name">
 					<button class="btn btn-success" id="addNode">Add Node</button>
 					<br>
+					<br>
 					
-					<h3>+/- Edge</h3>
+					<h4>+/- Edge</h4>
 					<p>Source node: <strong id="source"></strong></p>
 					<p>Target node: <strong id="target"></strong></p>
 					<button class="btn btn-success" id="addEdge">Add Edge</button>
 					<button class="btn btn-success" id="deleteEdge">Delete Edge</button>
 					<button class="btn btn-success" id="clearNodes">Clear Nodes</button>
 					<br>
+					<br>
 					
-					<h3>- Delete Node</h3>
+					<h4>- Delete Node</h4>
 					<ul>
 						<li> Hit "Selection Mode" button at the top right</li>
 						<li> Select a node with <b>Shift + D.</b></li>
 					</ul>
+					<br>
+					<br>
+					
+					<h4>+/- Tags</h4>
+					<input type="text" class="form-control" maxlength="15" placeholder="enter tags here">
 				</div>
 				<div id="graph" class="pull-right">
-					<canvas id="viewport" width="800" height="800" style="border: 1px solid #000;"></canvas>
+					<canvas id="viewport" width="800" height="600" style="border: 1px solid #000;"></canvas>
 				</div>
 			</div>
 			<script type="text/javascript" src="/static/js/main.js"></script>

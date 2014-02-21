@@ -7,32 +7,25 @@
 	<body>
 		<div class="container" style="padding-top: 50px;">
 		<header>
-			<h1>GraphBin <small>Your Saved Graphs</small>
+			<h1>GraphBin <small>Account</small>
 				<a class="btn btn-default pull-right" href="/logout">Logout</a>
 			</h1> 
 		</header>
-			<div class="col-lg-4">
-				<div class="col-lg-15">
-				{% for graph in all_graphs %}
-					<h3>
-						<a href="/graph/{{graph}}">{{graph}}</a> 
-						<a class="btn btn-default pull-right" href="#">
-							<span class="glyphicon glyphicon-cog"></span>
-						</a>
-						<a class="btn btn-default pull-right" href="#">
-							<span class="glyphicon glyphicon-trash"></span>
-						</a>
-					</h3>
-				{% endfor %}
+			<div class="col-lg-6">
+				<h2>Your Saved Graphs</h2>
+				<div class="col-lg-15" id="graphList">
 				</div>
 			</div>
 
 			<div class="col-lg-4 pull-right">
+				<h2>Controls</h2>
 				<div class="input-group">
-					<input type="text" class="form-control" maxlength="15" id="createGraphInput">
+					<input type="text" class="form-control" maxlength="25" id="createGraphInput">
 					<span class="input-group-btn">
-						<button class="btn btn-default" id="createGraphButton">Create New Graph</button>
+						<button class="btn btn-primary" id="createGraphButton">Create New Graph</button>
 					</span>
+				</div>
+				<div id="message">
 				</div>
 			</div>
 			<script type="text/javascript" src="/static/js/account.js"></script>

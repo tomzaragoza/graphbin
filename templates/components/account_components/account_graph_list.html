@@ -1,0 +1,11 @@
+{% for graph in all_graphs %}
+	<h3>
+		<a href="/graph/{{graph}}">{{graph}}</a> 
+		<a class="btn btn-default pull-right" href="#">
+			<span class="glyphicon glyphicon-cog"></span>
+		</a>
+		<a class="btn btn-default pull-right" href="#">
+			<span class="glyphicon glyphicon-trash"></span>
+		</a>
+	</h3>
+{% endfor %}
