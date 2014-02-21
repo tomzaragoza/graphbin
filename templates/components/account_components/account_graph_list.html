@@ -11,14 +11,14 @@
 		</h3>
 	</div>
 {% endfor %}
-
 <script>
-$("button.settings").click(function() {
+$("button.settings").on('click', function() {
 	var graphName = $(this).attr('data-graph-name');
 	// call on /graph_settings/<graphname>
+
 });
 
-$("button.delete").click(function() {
+$("button.delete").on('click', function() {
 	var graphName = $(this).attr('data-graph-name');
 	// call on /delete_graph/<graphname>
 
@@ -29,5 +29,6 @@ $("button.delete").click(function() {
 				$("#response-box").html(data);
 			}
 	});
+
 });
 </script>
