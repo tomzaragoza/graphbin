@@ -20,9 +20,9 @@ $("#createGraphButton").click(function(e) {
 	var thisButton = this;
 
 	if (input === '' || input.indexOf(" ") !== -1 || input.indexOf("-") !== -1) {
-		$("#response-box").html("<h3><small>Cannot be empty or contain spaces.</small></h3>");
+		$("#response-box").html("<h1><small>Cannot be empty or contain spaces.</small></h1>");
 	} else {
-
+		$("#response-box").html("<h1><small>Loading...</small></h1>");
 		$(thisButton).prop("disabled", true);
 		$.ajax({
 				type: "POST",
