@@ -240,13 +240,18 @@ def graph_settings(graphname):
 
 	return render_template('components/account_components/account_graph_settings.html', graphname=graphname)
 
-@app.route('/rename_graph/<graphname>', methods=["POST"])
-def rename_graph(graphname):
+@app.route('/rename_graph/<old_graphname>', methods=["POST"])
+def rename_graph(old_graphname):
 	""" 
 		Rename the selected graph
 	"""
 
+	db_name = current_user['site_id'] # it's just used multiple times in this view
+
 	new_name = request.form['newName']
+	r.db(db_name).table_create(new_name).run()
+	r.db(db_name).table(new_name).insert(r.db(db_name).table(old_graphname)).run()
+	r.db(db_name).table_drop(old_graphname).run()
 	return jsonify(newName=new_name)
 
 @app.route('/graph/<graphname>')
