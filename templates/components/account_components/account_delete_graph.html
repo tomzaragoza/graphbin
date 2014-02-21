@@ -1,0 +1,29 @@
+<div class="form-group">
+	<h3><small>Are you sure you want to delete {{graphname}} ? </small></h3>
+	<button class="btn btn-success yup">Yup</button>
+	<button class="btn btn-danger nope">Nope</button>
+</div>
+
+<script>
+$("button.yup").click(function() {
+	console.log("yup");
+	$.ajax({
+			type: "POST",
+			url: "/delete_graph/" + '{{graphname}}',
+			success: function(data) {
+				if (data.deleted) {
+					$("#response-box").html('<h1><small>Successfully deleted {{graphname}}!</small></h1>');
+					$("#{{graphname}}-list-item").fadeOut(1000, function() {
+					});
+				} else {
+					$("#response-box").html('<h1><small>Error when trying to delete {{graphname}}!</small></h1>');
+				}
+			}
+	});
+
+});
+
+$("button.nope").click(function() {
+	$("#response-box").empty();
+});
+</script>

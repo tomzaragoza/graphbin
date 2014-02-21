@@ -1,0 +1,50 @@
+<h3><small>Settings: {{graphname}}</small></h3>
+<div class="input-group">
+	<input type="text" class="form-control" maxlength="25" data-graph-name='{{graphname}}' id="renameGraphInput">
+	<span class="input-group-btn">
+		<button class="btn btn-success rename" id="renameGraphButton">Rename</button>
+		<button class="btn btn-warning cancel">Cancel</button>
+	</span>
+</div>
+
+<script>
+$("button.cancel").click(function() {
+	$("#response-box").empty();
+});
+
+$("#renameGraphButton").click(function() {
+	var input = $("#renameGraphInput").val();
+	var oldGraphName = $("#renameGraphInput").attr('data-graph-name');
+	$("#graphRenameInput").val('');
+
+	var thisButton = this;
+
+	if (input === '' || input.indexOf(" ") !== -1 || input.indexOf("-") !== -1) {
+		$("#response-box").html("<h1><small>Cannot be empty or contain spaces.</small></h1>");
+	} else {
+		$("#response-box").html("<h1><small>Loading...</small></h1>");
+		$(thisButton).prop("disabled", true);
+		$.ajax({
+			type:"POST",
+			url: "/check_graph/" + input,
+			success: function(data) {
+				if (data.exists === true) {
+					$("#response-box").html("<h1><small>Already exists! Try another name.</small></h1>");
+					$(thisButton).removeAttr("disabled");
+				} else {
+					$.ajax({
+						type: "POST",
+						url: "/rename_graph/" + oldGraphName,
+						data: {'newName' : input},
+						success: function(d) {
+							loadGraphList(); // available in account.js
+							$("#response-box").html('<h1><small>Successfully renamed ' + oldGraphName + ' to ' + d.newName + '! </small></h1>');
+							$(thisButton).removeAttr("disabled");
+						}
+					});
+				}
+			}
+		});
+	}
+});
+</script>

@@ -231,6 +231,24 @@ def delete_graph(graphname):
 		except RqlRuntimeError:
 			return jsonify(deleted=False)
 
+@app.route('/graph_settings/<graphname>', methods=["GET"])
+def graph_settings(graphname):
+	""" 
+		Load the prompt for settings in the graph. 
+	"""
+	print "We are in the graph_settings view"
+
+	return render_template('components/account_components/account_graph_settings.html', graphname=graphname)
+
+@app.route('/rename_graph/<graphname>', methods=["POST"])
+def rename_graph(graphname):
+	""" 
+		Rename the selected graph
+	"""
+
+	new_name = request.form['newName']
+	return jsonify(newName=new_name)
+
 @app.route('/graph/<graphname>')
 @login_required
 def graph(graphname):
@@ -243,11 +261,6 @@ def graph(graphname):
 	except RqlRuntimeError:
 		return "Error: Graph '{0}'' does not exist".format(graphname)
 
-@app.route('/graph/settings/<graphname>')
-@login_required
-def graph_settings(graphname):
-	""" Load settings page for a particular graph """
-	pass
 
 @app.route('/store/<graphname>', methods=["POST"])
 @login_required
