@@ -20,7 +20,7 @@ $("#createGraphButton").click(function(e) {
 	var thisButton = this;
 
 	if (input === '' || input.indexOf(" ") !== -1 || input.indexOf("-") !== -1) {
-		$("#message").html("<h3><small>Cannot be empty or contain spaces.</small></h3>");
+		$("#response-box").html("<h3><small>Cannot be empty or contain spaces.</small></h3>");
 	} else {
 
 		$(thisButton).prop("disabled", true);
@@ -29,7 +29,7 @@ $("#createGraphButton").click(function(e) {
 				url: "/check_graph/" + input,
 				success: function(data) {
 					if (data.exists === true) {
-						$("#message").html("<h1><small>Already exists! Try another name.</small></h1>");
+						$("#response-box").html("<h1><small>Already exists! Try another name.</small></h1>");
 						$(thisButton).removeAttr("disabled");
 					} else { // it exists
 						$.ajax({
@@ -37,7 +37,11 @@ $("#createGraphButton").click(function(e) {
 								url: "/create_graph/" + input,
 								success: function(d) {
 									loadGraphList();
+									$("#response-box").html('<h1><small>Successfully added ' + input + '! </small></h1>');
 									$(thisButton).removeAttr("disabled");
+									$("#response-box").fadeOut(3500, function() {
+										$(this).empty();
+									});
 								}
 						});
 					}
