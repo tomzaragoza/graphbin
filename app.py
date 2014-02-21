@@ -55,6 +55,7 @@ def dbSetup():
 def before_request():
 	g.user = current_user
 
+
 def load_user_from_db(user_object):
 	user = User()
 	user.user_id = user_object['user_id']
@@ -119,6 +120,7 @@ def register():
 		form = RegisterForm(request.form)
 		return render_template('register.html', form = form)
 
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
 
@@ -159,6 +161,7 @@ def login():
 		form = LoginForm(request.form)                
 		return render_template('login.html', form = form)
 
+
 @app.route('/logout')
 @login_required   
 def logout():
@@ -187,6 +190,7 @@ def load_graph_list():
 	all_graphs.sort()
 	return render_template('components/account_components/account_graph_list.html', all_graphs=all_graphs)
 
+
 @app.route('/account')
 @login_required
 def account():
@@ -194,6 +198,7 @@ def account():
 		Load the user's graph collection page (account).
 	"""
 	return render_template('account.html')
+
 
 @app.route('/create_graph/<graphname>', methods=["POST"])
 @login_required
@@ -215,6 +220,7 @@ def check_graph(graphname):
 	except RqlRuntimeError:
 		return jsonify(exists=False)
 
+
 @app.route('/delete_graph/<graphname>', methods=["GET", "POST"])
 @login_required
 def delete_graph(graphname):
@@ -231,14 +237,14 @@ def delete_graph(graphname):
 		except RqlRuntimeError:
 			return jsonify(deleted=False)
 
+
 @app.route('/graph_settings/<graphname>', methods=["GET"])
 def graph_settings(graphname):
 	""" 
 		Load the prompt for settings in the graph. 
 	"""
-	print "We are in the graph_settings view"
-
 	return render_template('components/account_components/account_graph_settings.html', graphname=graphname)
+
 
 @app.route('/rename_graph/<old_graphname>', methods=["POST"])
 def rename_graph(old_graphname):
@@ -309,7 +315,7 @@ def store(graphname):
 		print "Storing edge to DB..."
 		source = request.form["source"]
 		target = request.form["target"]
-		edge_name = request.form["name"] # something like "n1 to n2", etc.
+		edge_name = request.form["edge_name"] # something like "n1 to n2", etc.
 
 		edge_info = {
 						"source": source,
@@ -328,6 +334,7 @@ def store(graphname):
 
 
 	return "stored {0} successfully".format(request.form['type'])
+
 
 @app.route('/load/<graphname>', methods=["GET"])
 @login_required
@@ -361,9 +368,10 @@ def load(graphname):
 
 	return jsonify(nodes=all_nodes, edges=all_edges)
 
-@app.route('/delete/<graphname>', methods=["POST"])
+
+@app.route('/delete_node/<graphname>', methods=["POST"])
 @login_required
-def delete(graphname):
+def delete_node(graphname):
 	""" 
 		Delete node from database
 	"""
@@ -377,6 +385,41 @@ def delete(graphname):
 	r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).delete().run()
 
 	return "succesfully deleted node {0} and its edges".format(node_name)
+
+@app.route('/delete_edge/<graphname>', methods=["POST"])
+@login_required
+def delete_edge(graphname):
+	""" 
+		Delete the edges in the DB.
+		Note that the edge selected might not exist in the DB.
+	"""
+	# Need to check vice versa of edges if it exists and delete both
+	edge_name = request.form["edge_name"]
+	reversed_edge_name = request.form['target'] + ' to ' + request.form['source']
+
+	edge_name_deleted = False
+	reversed_edge_name_deleted = False
+
+	db_name = current_user['site_id']
+	# Try first for the edge_name of the selected nodes in order
+	try:
+		r.db(db_name).table(graphname).filter(r.row['edge_name'] == edge_name).delete().run()
+		edge_name_deleted = True
+	except RqlRuntimeError:
+		print "Edge {0} does not exist".format(edge_name)
+
+	# Next, try the reversed edge_name of the selected nodes in reversed order
+	try:
+		r.db(db_name).table(graphname).filter(r.row['edge_name'] == reversed_edge_name).delete().run()
+		reversed_edge_name_deleted = True
+	except RqlRuntimeError:
+		print "Edge {0} does not exist".format(reversed_edge_name)
+
+	if edge_name_deleted and reversed_edge_name_deleted:
+		return jsonify(deleted=True, name=edge_name, reversedEdgeName=reversed_edge_name)
+	else:
+		return jsonify(deleted=False, name=edge_name, reversedEdgeName=reversed_edge_name)
+
 
 
 if __name__ == '__main__':

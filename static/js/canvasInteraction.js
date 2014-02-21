@@ -8,7 +8,6 @@ var graphname = pathname[pathname.length -1];
 console.log(graphname);
 $("#graphname-header").html(graphname);
 
-
 /*
 	The Graph mouse operations
 */
@@ -55,7 +54,7 @@ $("#viewport").mousedown(function(e){
 
 				$.ajax({
 					type:"POST",
-					url: "/delete/" + graphname,
+					url: "/delete_node/" + graphname,
 					data: params,
 					success: function(data) {
 						console.log("sucessfully deleted");
@@ -246,7 +245,7 @@ $("#addEdge").click(function(e) {
 		var params = {
 						'source': n_source_name,
 						'target': n_target_name,
-						'name': n_source_name + ' to ' + n_target_name,
+						'edge_name': n_source_name + ' to ' + n_target_name,
 						'type': 'edge'
 			};
 		$.ajax({
@@ -262,6 +261,46 @@ $("#addEdge").click(function(e) {
 		e.preventDefault();
 	} else {
 		alert("Please select two appropriate nodes to add an edge to.");
+		selectionToRed();
+	}
+});
+
+
+$("#deleteEdge").click(function(e) {
+	console.log("deleteEdge clicked");
+	var n_source_name = $("#source").html();
+	var n_target_name = $("#target").html();
+
+	if (n_source_name.length > 0 && n_target_name.length > 0 ) {
+		var n_source = sys.getNode(n_source_name);
+		var n_target = sys.getNode(n_target_name);
+
+		var params = {
+						'source': n_source_name,
+						'target': n_target_name,
+						'edge_name': n_source_name + ' to ' + n_target_name,
+						'type': 'edge'
+			};
+		$.ajax({
+				type: "POST",
+				url: "/delete_edge/" + graphname,
+				data: params,
+				success: function(data) {
+					$("#source").empty();
+					$("#target").empty();
+
+					if (data.deleted) {
+						var allEdges = sys.getEdges(n_source, n_target);
+						 
+						for  (var i = 0; i < allEdges.length; i++) {
+							sys.pruneEdge(allEdges[i]); // Don't need to specify length.
+						}
+					}
+				}
+		});
+		e.preventDefault();
+	} else {
+		alert("Please select two nodes to delete an edge from.");
 		selectionToRed();
 	}
 });
