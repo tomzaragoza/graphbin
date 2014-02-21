@@ -8,12 +8,6 @@ var sys = arbor.ParticleSystem({repulsion: 0, stiffness:1000, friction: 0.5, gra
 sys.parameters({gravity:false});
 sys.renderer = Renderer("#viewport");
 
-$(window).on("navigate", function (event, data) {
-	var direction = data.state.direction;
-	if (direction == 'back') {
-		window.location.href = "localhost:8000/account";
-	}
-});
 
 function backupNodes() {
 	persistentAddNode(sys, "graph1", "n1", {"x": -3.467437209640285 , "y": -0.318212010897696, "mass": 50, "color": "black", "shape": "dot", "label": "200", "fixed": true});

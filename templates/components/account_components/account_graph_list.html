@@ -20,7 +20,6 @@ $("button.settings").on('click', function() {
 
 $("button.delete").on('click', function() {
 	var graphName = $(this).attr('data-graph-name');
-	// call on /delete_graph/<graphname>
 
 	$.ajax({
 			type: "GET",
