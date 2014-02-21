@@ -290,10 +290,9 @@ $("#deleteEdge").click(function(e) {
 					$("#target").empty();
 
 					if (data.deleted) {
-						var allEdges = sys.getEdges(n_source, n_target);
-						 
+						var allEdges = sys.getEdges(n_source, n_target).concat(sys.getEdges(n_target, n_source));
 						for  (var i = 0; i < allEdges.length; i++) {
-							sys.pruneEdge(allEdges[i]); // Don't need to specify length.
+							sys.pruneEdge(allEdges[i]);
 						}
 					}
 				}
