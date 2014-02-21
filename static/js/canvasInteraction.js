@@ -172,7 +172,7 @@ function selectionToBlue() {
 }
 
 $("#selectionMode").click(function(e) {
-	if ($("#selectionMode").attr("class").indexOf("btn-primary") !== -1) { 
+	if ($("#selectionMode").attr("class").indexOf("btn-primary") !== -1) {
 		// contains btn-primary
 		selectionToRed();
 	} else {
@@ -201,7 +201,7 @@ $("#addNode").click(function(e) {
 		$("#node-name").val('');
 		var xCoord = -6.0;
 		var yCoord = -7.0;
-		var data = {	
+		var data = {
 						"x": xCoord,
 						"y": yCoord,
 						"mass": 50,
