@@ -180,7 +180,9 @@ def index():
 @app.route('/load_graph_list', methods=["POST"])
 @login_required
 def load_graph_list():
-	print "wat"
+	""" 
+		Load the list of graphs for a user.
+	"""
 	all_graphs = r.db(current_user['site_id']).table_list().run()
 	all_graphs.sort()
 	return render_template('components/account_components/account_graph_list.html', all_graphs=all_graphs)
@@ -200,6 +202,7 @@ def create_graph(graphname):
 	r.db(current_user['site_id']).table_create(graphname).run()
 	return jsonify(exists=True)
 
+
 @app.route('/check_graph/<graphname>', methods=["POST"])
 @login_required
 def check_graph(graphname):
@@ -212,6 +215,15 @@ def check_graph(graphname):
 	except RqlRuntimeError:
 		return jsonify(exists=False)
 
+@app.route('/delete_graph/<graphname>', methods=["GET", "POST"])
+@login_required
+def delete_graph(graphname):
+	""" 
+		Delete the selected graph IF POST.
+		Render the delete graph prompt IF GET.
+	"""
+	if request.method == "GET":
+		return render_template('components/account_components/account_delete_graph.html', graphname=graphname)
 
 @app.route('/graph/<graphname>')
 @login_required

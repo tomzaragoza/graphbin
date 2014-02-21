@@ -37,6 +37,7 @@ $("#createGraphButton").click(function(e) {
 								url: "/create_graph/" + input,
 								success: function(d) {
 									loadGraphList();
+
 									$("#response-box").html('<h1><small>Successfully added ' + input + '! </small></h1>');
 									$(thisButton).removeAttr("disabled");
 									$("#response-box").fadeOut(3500, function() {

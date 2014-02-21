@@ -1,11 +1,31 @@
 {% for graph in all_graphs %}
 	<h3>
 		<a href="/graph/{{graph}}">{{graph}}</a> 
-		<a class="btn btn-default pull-right" href="#">
+		<button class="btn btn-default pull-right settings" data-graph-name="{{graph}}">
 			<span class="glyphicon glyphicon-cog"></span>
-		</a>
-		<a class="btn btn-default pull-right" href="#">
+		</button>
+		<button class="btn btn-default pull-right delete" data-graph-name="{{graph}}">
 			<span class="glyphicon glyphicon-trash"></span>
-		</a>
+		</button>
 	</h3>
 {% endfor %}
+
+<script>
+$("button.settings").click(function() {
+	var graphName = $(this).attr('data-graph-name');
+	// call on /graph_settings/<graphname>
+});
+
+$("button.delete").click(function() {
+	var graphName = $(this).attr('data-graph-name');
+	// call on /delete_graph/<graphname>
+
+	$.ajax({
+			type: "GET",
+			url: "/delete_graph/" + graphName,
+			success: function(data) {
+				$("#response-box").html(data);
+			}
+	});
+});
+</script>
