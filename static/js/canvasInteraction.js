@@ -162,6 +162,18 @@ $(document).click(function(e) {
     }
 });
 
+function stringGen(len)
+{
+    var text = " ";
+
+    var charset = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < len; i++ )
+        text += charset.charAt(Math.floor(Math.random() * charset.length));
+
+    return text;
+}
+
 var graphFocus = function () {
 	$("#viewport").attr("tabindex", "0");
 	$("#viewport").focus();
@@ -196,10 +208,11 @@ $("#addOrEditNode").click(function(e) {
 	var nodeName = $("#node-name").val();
 	var canCreateNode = false;
 
-	if (nodeName === '' || ~nodeName.indexOf(',')) {
-		alert("Incorrect node name: must not contain commas or be empty");
-		// if the same name as another node, it will update it.
-	} else if (nodeLabel === '') {
+	if (nodeName === '') {
+		nodeName = stringGen(13);
+	} 
+
+	if (nodeLabel === '') {
 		alert("Incorrect node label: must not be empty");
 	} else {
 		canCreateNode = true; // passed the two tests above

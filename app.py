@@ -10,6 +10,8 @@ import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError
 
 import os
+import string
+import random
 
 app = Flask(__name__)
 app.secret_key = '8yK6_Mf2D_-R6GB3C1222o1ix98o-YR_'
@@ -288,7 +290,6 @@ def store(graphname):
 		shape = request.form["shape"]
 		node_name = request.form["node_name"]
 		graph_obj_type = request.form["type"]
-
 
 		node_info = {
 						"label": label,
