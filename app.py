@@ -24,6 +24,7 @@ RDB_HOST =  os.environ.get('RDB_HOST') or 'localhost'
 RDB_PORT = os.environ.get('RDB_PORT') or 28015
 DB_MAIN = "graphbox"
 DB_USERS = "users"
+DB_PUBLIC_GRAPHS = "public_graphs"
 rethink = r.connect("localhost", 28015).repl()
 
 # ---------
@@ -41,6 +42,12 @@ def dbSetup():
 	# 	print 'Database {0} setup completed. Now run the app without --setup.'.format(DB_MAIN)
 	# except RqlRuntimeError:
 	# 	print 'App database {0} already exists. Run the app without --setup.'.format(DB_MAIN)
+
+	try:
+		r.db_create(DB_PUBLIC_GRAPHS).run(connection)
+		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_PUBLIC_GRAPHS)
+	except RqlRuntimeError:
+		print 'App database {0} already exists. Run the app without --setup'.format(DB_PUBLIC_GRAPHS)
 
 	try:
 		r.db_create(DB_USERS).run(connection)
