@@ -252,6 +252,8 @@ $("#addOrEditNode").click(function(e) {
 			params['y'] = yCoord;
 		}
 
+		isEditing = false;
+
 		$.ajax({
 				type: "POST",
 				url: "/store/" + graphname,
