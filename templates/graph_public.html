@@ -9,12 +9,19 @@
 				<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 		</head>
 		<body>
-			<div class="container" style="padding-top: 50px;">
-				<p>Public display of the graph that was created goes here</p>
-				{{url}}
 
+			<div class="container" style="padding-top: 50px;">
+				<h1> GraphBin
+					<small class="pull-right" style="font-size: 15px;">
+					</small>
+				</h1>
+
+				<div class="container" id="side">
+					<h1>
+						<small id="graphname-header">{{url}}</small>
+					</h1>
+				</div>
 				<div id="graph" class="pull-right">
-					<h1></h1>
 					<canvas id="viewport" width="800" height="600" style="border: 1px solid #000;"></canvas>
 				</div>
 			</div>
