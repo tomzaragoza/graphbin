@@ -231,10 +231,11 @@ def public_graph(public_url):
 	print pub_graph_data
 	if pub_graph_data is not None:
 		graphname = pub_graph_data['graph']
+		site_id = pub_graph_data['user']
 		print graphname
 
 		all_nodes = []
-		cursor_nodes = r.db(current_user['site_id']).table(graphname).filter(r.row["type"] == "node").run()
+		cursor_nodes = r.db(site_id).table(graphname).filter(r.row["type"] == "node").run()
 		print "after making of the cursor nodes"
 		for d in cursor_nodes:
 			del d['id']
@@ -251,7 +252,7 @@ def public_graph(public_url):
 		print "im after loading the cursor nodes"
 
 		all_edges =[]
-		cursor_edge = r.db(current_user['site_id']).table(graphname).filter(r.row["type"] == "edge").run()
+		cursor_edge = r.db(site_id).table(graphname).filter(r.row["type"] == "edge").run()
 		for d in cursor_edge:
 			del d['id']
 			d['source'] = str(d['source'])
