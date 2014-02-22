@@ -1,1 +1,24 @@
-<p>Public display of the graph that was created goes here</p>
+
+<html>
+		<head>
+				<script type="text/javascript" src="/static/js/jquery-2.1.0.min.js"></script>
+				<script type="text/javascript" src="/static/arbor/lib/arbor.js" ></script>
+				<script type="text/javascript" src="/static/arbor/demos/_/graphics.js" ></script>
+				<script type="text/javascript" src="/static/arbor/demos/halfviz/src/renderer.js" ></script>
+				<link rel="stylesheet" href="/static/css/bootstrap.min.css"></script>
+				<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+		</head>
+		<body>
+			<div class="container" style="padding-top: 50px;">
+				<p>Public display of the graph that was created goes here</p>
+				{{url}}
+
+				<div id="graph" class="pull-right">
+					<h1></h1>
+					<canvas id="viewport" width="800" height="600" style="border: 1px solid #000;"></canvas>
+				</div>
+			</div>
+			<script type="text/javascript" src="/static/js/main_public.js"></script>
+		</body>
+
+</html>
