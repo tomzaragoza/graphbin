@@ -8,17 +8,22 @@
 				<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 		</head>
 		<body>
-			<div class="container" style="padding-top: 30px;">
-				<h1> GraphBin <small>Home</small></h1>
-
+			<div class="jumbotron">
+				<div class="container">
+				<h1> GraphBin</h1>
 				<h3>Create your own graphs online for free.</h3>
+
 				{% if not logged_in %}
 				<p>Login or Register below.</p>
-				<p><a class="btn btn-default" href="/login">Login</a></p>
-				<p><a class="btn btn-default" href="/register">Register</a></p>
+				<a class="btn btn-primary btn-lg" href="/login">Login</a>
+				<a class="btn btn-primary btn-lg" href="/register">Register</a>
 				{% else %}
-				<p><a href="/account">Your Account</a></p>
+				<p><a class="btn btn-primary btn-lg" href="/account">Your Account</a></p>
 				{% endif %}
+
+				</div>
+			</div>
+			<div class="container" style="padding-top: 30px;">
 		</body>
 
 </html>
