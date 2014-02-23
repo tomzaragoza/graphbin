@@ -8,6 +8,7 @@
 			<h1>GraphBin <small>Register</small></h1>
 			<br>
 			<div class="col-md-4">
+				<p>Just add in your information, click "start" to prove you are a human, then finally click on register!</p>
 				<form method="post" class="form" action="{{ url_for('register')}}">
 					<div class="form-group">
 						{{ form.email(class_ = 'form-control', placeholder = form.email.label.text, required = true) }}
@@ -18,8 +19,10 @@
 					<div class="form-group">
 						{{ form.confirm(class_ = 'form-control last-input', placeholder = form.confirm.label.text, required = true) }}
 					</div>
-					<p class="pull-right"><a href="{{ url_for('login') }}">Login</a></p>
+					{{ayah_html|safe}}
+					<br>
 					<input type="submit" value="Register" class="btn btn-primary btn-lg btn-block">
+					<p class="pull-right"><a href="{{ url_for('login') }}">Login</a></p>
 				</form>
 			</div>
 		</div>

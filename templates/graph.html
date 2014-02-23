@@ -11,7 +11,10 @@
 		</head>
 		<body>
 			<div class="container" style="padding-top: 50px;">
-				<h1> GraphBin
+				<h1> GraphBin 
+					<small style="font-size: 18px;">
+						public url: <a style="text-decoration: none;" target="_blank" href="/{{pub_url}}">/{{pub_url}}</a>
+					</small>
 					<small class="pull-right" style="font-size: 15px;">
 						<a style="text-decoration: none;" href='/account'>Account</a> | 
 						<a style="text-decoration: none;" href='/logout'>Logout</a>
@@ -36,7 +39,7 @@
 						<small>- Node</small>
 					</h2>
 					<p><b>Selected Node: </b> <strong id="node-to-delete"></strong></p>
-					<button class="btn btn-success pull-right" id="deleteNode">Delete Node</button>
+					<button class="btn btn-warning pull-right" id="deleteNode">Delete Node</button>
 					<br>
 					
 					<h2>
@@ -44,8 +47,8 @@
 					</h2>
 					<p><b>Source node:</b> <strong id="source"></strong></p>
 					<p><b>Target node: </b><strong id="target"></strong></p>
-					<button class="btn btn-success" id="clearNodes">Clear Nodes</button>
-					<button class="btn btn-success" id="deleteEdge">Delete Edge</button>
+					<button class="btn btn-default" id="clearNodes">Clear Nodes</button>
+					<button class="btn btn-default" id="deleteEdge">Delete Edge</button>
 					<button class="btn btn-success" id="addEdge">Add Edge</button>
 					<br>
 					

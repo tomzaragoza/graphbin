@@ -16,10 +16,13 @@
 						{{ form.password(class_ = 'form-control last-input', placeholder = form.password.label.text, required = true) }}
 					</div>
 
-					<p class="pull-right"><a href="{{ url_for('register') }}">Register</a></p>
+					{{ayah_html|safe}}
+					<br>
 					<input type="submit" value="Submit" class="btn btn-primary btn-lg btn-block">
+					<p class="pull-right"><a href="{{ url_for('register') }}">Register</a></p>
 				</form>
 			</div>
+
 		</div>
 	</body>
 </html>

@@ -9,6 +9,9 @@ from hash_helpers import hash_password, hash_email
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError
 
+import ayah
+ayah.configure("322e978072eb0dabad2a51e05e8bb53aaa38d246", "79e8cd8c44ea4ca311815fdb165a920e0558b986")
+
 import os
 import string
 import random
@@ -106,81 +109,101 @@ def load_user(userid):
 # -------------------------
 @app.route('/register', methods=['POST', 'GET'])
 def register():
+	ayah_html = ayah.get_publisher_html()
 
 	if request.method == 'POST':
 		form = request.form
 		hashed_email = unicode(hash_email(form['email']))
 
-		try:
-			# if this runs, DB already exists with email and we continue on
-			r.db_create(hashed_email).run() # this is where all graphs will be saved
+		secret = form['session_secret']
+		passed = ayah.score_result(secret)
 
-			new_user = {}
-			new_user['email'] = form['email']
-			new_user['user_id'] = form['email']
-			new_user['password'] = hash_password(form['email'], form['password'])
-			new_user['site_id'] = hashed_email # just the email hashed
+		if passed:
+			try:
+				# if this runs, DB already exists with email and we continue on
+				r.db_create(hashed_email).run() # this is where all graphs will be saved
 
-			r.db(DB_USERS).table_create(hashed_email).run()
+				new_user = {}
+				new_user['email'] = form['email']
+				new_user['user_id'] = form['email']
+				new_user['password'] = hash_password(form['email'], form['password'])
+				new_user['site_id'] = hashed_email # just the email hashed
 
-			r.db(DB_USERS).table(hashed_email).insert(new_user).run()
-			r.db(DB_USERS).table(hashed_email).index_create("site_id").run()
-			r.db(DB_USERS).table(hashed_email).index_wait("site_id").run()
+				r.db(DB_USERS).table_create(hashed_email).run()
 
-			flash('Thanks for registering! Wanna login?')
+				r.db(DB_USERS).table(hashed_email).insert(new_user).run()
+				r.db(DB_USERS).table(hashed_email).index_create("site_id").run()
+				r.db(DB_USERS).table(hashed_email).index_wait("site_id").run()
 
-			return redirect(url_for('login'))
-		except RqlRuntimeError: 
+				flash('Thanks for registering! Wanna login?')
+
+				return redirect(url_for('login'))
+			except RqlRuntimeError: 
+				form = RegisterForm(request.form)
+				print "Email already exists?"
+				flash("Email already exists! Try again")
+
+				return render_template('register.html', form=form, ayah_html=ayah_html)
+		else:
+			print "You ain't no human!"
 			form = RegisterForm(request.form)
-			print "Email already exists?"
-			flash("Email already exists! Try again")
+			return render_template('register.html', form=form, ayah_html=ayah_html)
 
-			return render_template('register.html', form=form)
 
 	elif request.method == 'GET':
 		form = RegisterForm(request.form)
-		return render_template('register.html', form = form)
+		return render_template('register.html', form=form, ayah_html=ayah_html)
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
 
+	ayah_html = ayah.get_publisher_html()
+
 	if request.method == 'POST':
 		form = request.form
 		hashed_email = unicode(hash_email(form['email']))
 
-		try:
-			# if run, name already exists
-			user_object = None
-			user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
-			for d in user_object_cursor:
-				user_object = d
+		secret = form['session_secret']
+		passed = ayah.score_result(secret)
 
-			entered_password = hash_password(form['email'], form['password'])
-			if entered_password == user_object['password']: #check both hashed versions if they match
-				user = User()
-				user.email = form['email']
-				user.user_id = form['email']
-				user.password = entered_password
-				user.site_id = hashed_email
+		if passed:
+			try:
+				# if run, name already exists
+				user_object = None
+				user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
+				for d in user_object_cursor:
+					user_object = d
 
-				login_user(user)
+				entered_password = hash_password(form['email'], form['password'])
+				if entered_password == user_object['password']: #check both hashed versions if they match
+					user = User()
+					user.email = form['email']
+					user.user_id = form['email']
+					user.password = entered_password
+					user.site_id = hashed_email
 
-				return redirect(url_for('account'))
-			else:
+					login_user(user)
+
+					return redirect(url_for('account'))
+				else:
+					form = LoginForm(request.form)
+					print "incorrect username or password! try again"
+					flash("aww ye")
+					return render_template('login.html', form=form, ayah_html=ayah_html)
+
+			except RqlRuntimeError:
 				form = LoginForm(request.form)
 				print "incorrect username or password! try again"
-				flash("aww ye")
-				return render_template('login.html', form=form)
-
-		except RqlRuntimeError:
+				return render_template('login.html', form=form, ayah_html=ayah_html)
+		else:
 			form = LoginForm(request.form)
-			print "incorrect username or password! try again"
-			return render_template('login.html', form=form)
+			print "You did not pass the human test!"
+			return render_template('login.html', form=form, ayah_html=ayah_html)
 		
 	else:
 		form = LoginForm(request.form)                
-		return render_template('login.html', form = form)
+		return render_template('login.html', form=form, ayah_html=ayah_html)
 
 
 @app.route('/logout')
@@ -224,19 +247,18 @@ def account():
 @app.route('/public_load/<public_url>', methods=["GET"])
 def public_graph(public_url):
 
-
 	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(public_url, index="url").run()
+
 	for doc in pub_graph_cursor:
 		pub_graph_data = doc
-	print pub_graph_data
+
 	if pub_graph_data is not None:
 		graphname = pub_graph_data['graph']
 		site_id = pub_graph_data['user']
-		print graphname
 
 		all_nodes = []
 		cursor_nodes = r.db(site_id).table(graphname).filter(r.row["type"] == "node").run()
-		print "after making of the cursor nodes"
+
 		for d in cursor_nodes:
 			del d['id']
 			d['node_name'] = str(d['node_name'])
@@ -249,7 +271,6 @@ def public_graph(public_url):
 			d['y'] = float(d['y'])
 
 			all_nodes.append(d)
-		print "im after loading the cursor nodes"
 
 		all_edges =[]
 		cursor_edge = r.db(site_id).table(graphname).filter(r.row["type"] == "edge").run()
@@ -262,17 +283,22 @@ def public_graph(public_url):
 		return jsonify(nodes=all_nodes, edges=all_edges)
 
 
-@app.route('/p/<public_url>', methods=["GET"])
+@app.route('/<public_url>', methods=["GET"])
 def public_load(public_url):
 
-	return render_template('graph_public.html', url=public_url)
+	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(public_url, index="url").run()
+	num_of_graphs = len(list(pub_graph_cursor))
+	if num_of_graphs == 0:
+		return "Nothing at that address..."
+	elif num_of_graphs > 0:
+		return render_template('graph_public.html', url=public_url)
 
 @app.route('/create_graph/<graphname>', methods=["POST"])
 @login_required
 def create_graph(graphname):
 	""" Create the graph with the given graphname"""
 	db_name = current_user['site_id']
-	public_association = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(8))
+	public_association = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(8))
 
 	r.db(db_name).table_create(graphname).run()
 
@@ -361,7 +387,11 @@ def graph(graphname):
 	"""
 	try:
 		r.db(current_user['site_id']).table(graphname).run() # if this runs, graphname exists
-		return render_template('graph.html')
+
+		pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(graphname, index="graph").run()
+		for d in pub_graph_cursor:
+			pub_graph_obj = d
+		return render_template('graph.html', pub_url=pub_graph_obj['url'])
 	except RqlRuntimeError:
 		return "Error: Graph '{0}'' does not exist".format(graphname)
 
