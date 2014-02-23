@@ -2,6 +2,7 @@ from flask import *
 from flask.ext.login import LoginManager, login_user, logout_user, current_user, login_required
 from models import User
 from forms import RegisterForm, LoginForm
+from werkzeug.contrib.fixers import ProxyFix
 from hash_helpers import hash_password, hash_email
 
 # from pprint import pprint as pretty
@@ -18,6 +19,7 @@ import random
 
 app = Flask(__name__)
 app.secret_key = '8yK6_Mf2D_-R6GB3C1222o1ix98o-YR_'
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
