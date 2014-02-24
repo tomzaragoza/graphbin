@@ -160,47 +160,38 @@ def register():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
 
-	ayah_html = ayah.get_publisher_html()
 
 	if request.method == 'POST':
 		form = request.form
 		hashed_email = unicode(hash_email(form['email']))
 
-		secret = form['session_secret']
-		passed = ayah.score_result(secret)
+		try:
+			# if run, name already exists
+			user_object = None
+			user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
+			for d in user_object_cursor:
+				user_object = d
 
-		if passed:
-			try:
-				# if run, name already exists
-				user_object = None
-				user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
-				for d in user_object_cursor:
-					user_object = d
+			entered_password = hash_password(form['email'], form['password'])
+			if entered_password == user_object['password']: #check both hashed versions if they match
+				user = User()
+				user.email = form['email']
+				user.user_id = form['email']
+				user.password = entered_password
+				user.site_id = hashed_email
 
-				entered_password = hash_password(form['email'], form['password'])
-				if entered_password == user_object['password']: #check both hashed versions if they match
-					user = User()
-					user.email = form['email']
-					user.user_id = form['email']
-					user.password = entered_password
-					user.site_id = hashed_email
+				login_user(user)
 
-					login_user(user)
-
-					return redirect(url_for('account'))
-				else:
-					form = LoginForm(request.form)
-					print "incorrect username or password! try again"
-					flash("aww ye")
-					return render_template('login.html', form=form, ayah_html=ayah_html)
-
-			except RqlRuntimeError:
+				return redirect(url_for('account'))
+			else:
 				form = LoginForm(request.form)
 				print "incorrect username or password! try again"
+				flash("aww ye")
 				return render_template('login.html', form=form, ayah_html=ayah_html)
-		else:
+
+		except RqlRuntimeError:
 			form = LoginForm(request.form)
-			print "You did not pass the human test!"
+			print "incorrect username or password! try again"
 			return render_template('login.html', form=form, ayah_html=ayah_html)
 		
 	else:
