@@ -3,7 +3,7 @@ from flask.ext.login import LoginManager, login_user, logout_user, current_user,
 from models import User
 from forms import RegisterForm, LoginForm
 from werkzeug.contrib.fixers import ProxyFix
-from hash_helpers import hash_password, hash_email
+from hash_helpers import hash_password, hash_username
 
 # from pprint import pprint as pretty
 
@@ -29,6 +29,8 @@ RDB_HOST =  os.environ.get('RDB_HOST') or 'localhost'
 RDB_PORT = os.environ.get('RDB_PORT') or 28015
 DB_MAIN = "graphbox"
 DB_USERS = "users"
+DB_EMAILS = "emails" # maps emails to usernames, if an email address is entered
+T_EMAILS = "emails_to_users"
 DB_PUBLIC_GRAPHS = "public_graphs"
 T_PUBLIC_GRAPHS = "url_to_graphs"
 rethink = r.connect("localhost", 28015).repl()
@@ -71,6 +73,22 @@ def dbSetup():
 		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_USERS)
 	except RqlRuntimeError:
 		print 'App database {0} already exists. Run the app without --setup'.format(DB_USERS)
+
+	try:
+		r.db_create(DB_EMAILS).run(connection)
+		print "created DB EMAILS"
+		r.db(DB_EMAILS).table_create(T_EMAILS).run()
+		print "created table for DB EMAILS TEMAILS"
+
+		r.db(DB_EMAILS).table(T_EMAILS).index_create("email").run()
+		r.db(DB_EMAILS).table(T_EMAILS).index_wait("email").run()
+
+		r.db(DB_EMAILS).table(T_EMAILS).index_create("user").run()
+		r.db(DB_EMAILS).table(T_EMAILS).index_wait("user").run()
+
+		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_EMAILS)
+	except RqlRuntimeError:
+		print 'App database {0} already exists. Run the app without --setup'.format(DB_EMAILS)
 	finally:
 		connection.close()
 
@@ -87,6 +105,7 @@ def load_user_from_db(user_object):
 	user.user_id = user_object['user_id']
 	user.password = user_object['password']
 	user.email = user_object['email']
+	user.username = user_object['username']
 	user.site_id = user_object['site_id']
 	return user
 
@@ -94,9 +113,9 @@ def load_user_from_db(user_object):
 @login_manager.user_loader
 def load_user(userid):
 	user_object = None
-	hashed_email = hash_email(userid)
+	hashed_username = hash_username(userid)
 
-	user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
+	user_object_cursor = r.db(DB_USERS).table(hashed_username).get_all(hashed_username, index="site_id").run()
 	for doc in user_object_cursor:
 		user_object = doc
 
@@ -115,34 +134,85 @@ def register():
 
 	if request.method == 'POST':
 		form = request.form
-		hashed_email = unicode(hash_email(form['email']))
+		hashed_username = unicode(hash_username(form['username']))
 
 		secret = form['session_secret']
 		passed = ayah.score_result(secret)
 
 		if passed:
+
+			# check if the email exists already in the DB.
+			try:
+				# if len(form['email']) == 0:
+				# 	raise RqlRuntimeError # this is because we can't create a DB with empty string
+
+				email_user_object = None
+				email_user_cursor = r.db(DB_EMAILS).table(T_EMAILS).get_all(form['email'], index="email").run()
+				for d in email_user_cursor:
+					email_user_object = d
+
+
+				# r.db(DB_EMAILS).table(T_EMAILS).get_all
+				# cases: crashes when empty, or exists
+				if len(form['email']) == 0:
+					pass
+				elif len(form['email']) > 0:
+					if email_user_object is not None:
+						if email_user_object['email'] == form['email']:
+							form = RegisterForm(request.form)
+							print "Email already exists!"
+							flash("Email already exists! Try again")
+
+							return render_template('register.html', form=form, ayah_html=ayah_html)
+						else:
+							pass
+
+				# else:
+				# 	email_map_obj = {
+				# 					'username': form['username'],
+				# 					'email': form['email']
+				# 				}
+				# 	r.db(DB_EMAILS).table(T_EMAILS).insert(email_map_obj).run()
+
+			except RqlRuntimeError:
+				form = RegisterForm(request.form)
+				print "Email already exists!"
+				flash("Email already exists! Try again")
+
+				return render_template('register.html', form=form, ayah_html=ayah_html)
+
 			try:
 				# if this runs, DB already exists with email and we continue on
-				r.db_create(hashed_email).run() # this is where all graphs will be saved
+				r.db_create(hashed_username).run() # this is where all graphs will be saved
 
 				new_user = {}
-				new_user['email'] = form['email']
-				new_user['user_id'] = form['email']
-				new_user['password'] = hash_password(form['email'], form['password'])
-				new_user['site_id'] = hashed_email # just the email hashed
+				new_user['email'] = form['email'] # can be empty, but must be unique, as checked above.
+				new_user['user_id'] = form['username']
+				new_user['username'] = form['username']
+				new_user['password'] = hash_password(form['username'], form['password'])
+				new_user['site_id'] = hashed_username # just the username hashed
 
-				r.db(DB_USERS).table_create(hashed_email).run()
+				r.db(DB_USERS).table_create(hashed_username).run()
 
-				r.db(DB_USERS).table(hashed_email).insert(new_user).run()
-				r.db(DB_USERS).table(hashed_email).index_create("site_id").run()
-				r.db(DB_USERS).table(hashed_email).index_wait("site_id").run()
+				r.db(DB_USERS).table(hashed_username).insert(new_user).run()
+				r.db(DB_USERS).table(hashed_username).index_create("site_id").run()
+				r.db(DB_USERS).table(hashed_username).index_wait("site_id").run()
+
+				r.db(DB_USERS).table(hashed_username).index_create("email").run()
+				r.db(DB_USERS).table(hashed_username).index_wait("email").run()
+
+				email_map_obj = {
+									'username': form['username'],
+									'email': form['email']
+								}
+				r.db(DB_EMAILS).table(T_EMAILS).insert(email_map_obj).run()
 
 				flash('Thanks for registering! Wanna login?')
 
 				return redirect(url_for('login'))
 			except RqlRuntimeError: 
 				form = RegisterForm(request.form)
-				print "Email already exists?"
+				print "Username already exists!"
 				flash("Email already exists! Try again")
 
 				return render_template('register.html', form=form, ayah_html=ayah_html)
@@ -163,22 +233,21 @@ def login():
 
 	if request.method == 'POST':
 		form = request.form
-		hashed_email = unicode(hash_email(form['email']))
+		hashed_username = unicode(hash_username(form['username']))
 
 		try:
 			# if run, name already exists
 			user_object = None
-			user_object_cursor = r.db(DB_USERS).table(hashed_email).get_all(hashed_email, index="site_id").run()
+			user_object_cursor = r.db(DB_USERS).table(hashed_username).get_all(hashed_username, index="site_id").run()
 			for d in user_object_cursor:
 				user_object = d
 
-			entered_password = hash_password(form['email'], form['password'])
+			entered_password = hash_password(form['username'], form['password'])
 			if entered_password == user_object['password']: #check both hashed versions if they match
 				user = User()
-				user.email = form['email']
-				user.user_id = form['email']
+				user.user_id = form['username']
 				user.password = entered_password
-				user.site_id = hashed_email
+				user.site_id = hashed_username
 
 				login_user(user)
 

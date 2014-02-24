@@ -3,8 +3,8 @@ from schematics.types import StringType
 
 class User(Model):
 	user_id = StringType(required=True)
-	# username = StringType(required=True)
-	email = StringType(required=True)
+	username = StringType(required=True)
+	email = StringType()
 	password = StringType(required=True) # remember, this is a password that is hashed
 	site_id = StringType(required=True)
 
@@ -21,4 +21,4 @@ class User(Model):
 		return unicode(self.user_id)
 
 	def __repr__(self):
-		return '<User {0}>'.format(self.email)
+		return '<User {0}>'.format(self.username)

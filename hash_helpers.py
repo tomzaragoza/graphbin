@@ -20,10 +20,10 @@ def hash_site_id(username, password, time):
 
 	return unique_id.hexdigest()
 
-def hash_email(email):
+def hash_username(username):
 	""" Hash dat username  """
 	unique_id = hashlib.md5()
-	unique_id.update(email)
+	unique_id.update(username)
 
 	return unique_id.hexdigest()
 
