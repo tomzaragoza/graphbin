@@ -187,16 +187,16 @@ def login():
 				form = LoginForm(request.form)
 				print "incorrect username or password! try again"
 				flash("aww ye")
-				return render_template('login.html', form=form, ayah_html=ayah_html)
+				return render_template('login.html', form=form)
 
 		except RqlRuntimeError:
 			form = LoginForm(request.form)
 			print "incorrect username or password! try again"
-			return render_template('login.html', form=form, ayah_html=ayah_html)
+			return render_template('login.html', form=form)
 		
 	else:
 		form = LoginForm(request.form)                
-		return render_template('login.html', form=form, ayah_html=ayah_html)
+		return render_template('login.html', form=form)
 
 
 @app.route('/logout')
@@ -544,4 +544,4 @@ if __name__ == '__main__':
 	if SETUPDB:
 		dbSetup()
 	# app.run(debug=True, host="localhost", port=8000)
-	app.run()
+	app.run(debug=True)
