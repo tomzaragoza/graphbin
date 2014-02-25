@@ -444,12 +444,26 @@ def rename_graph(old_graphname):
 	"""
 
 	db_name = current_user['site_id'] # it's just used multiple times in this view
+	access_key_public_graph = db_name + '+' + old_graphname
 
 	new_name = request.form['newName']
 	r.db(db_name).table_create(new_name).run()
 	r.db(db_name).table(new_name).insert(r.db(db_name).table(old_graphname)).run()
 	r.db(db_name).table_drop(old_graphname).run()
-	# Update in DB_PUBLIC_GRAPH
+
+	# Update in DB_PUBLIC_GRAPHS
+	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(access_key_public_graph, index="access").run()
+
+	new_access_data = {
+						'access': db_name + '+' + new_name
+					}
+	r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).filter(r.row['access'] == access_key_public_graph).update(new_access_data).run()
+	#get_all(access_key_public_graph, index="access").run()
+
+	# for d in pub_graph_cursor:
+	# 	pub_graph_obj = d
+
+
 	return jsonify(newName=new_name)
 
 @app.route('/graph/<graphname>')
