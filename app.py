@@ -368,8 +368,8 @@ def create_graph(graphname):
 							'url': public_association,
 							'user': current_user['site_id'],
 							'graph': graphname,
-							'type': 'mapping'
-						}
+							'type': 'mapping',
+			}
 	public_graph_data['access'] = public_graph_data['user'] + '+' + public_graph_data['graph']
 
 	r.db(db_name).table(graphname).insert(public_graph_data).run()
