@@ -370,6 +370,7 @@ def create_graph(graphname):
 							'graph': graphname,
 							'type': 'mapping'
 						}
+	public_graph_data['access'] = public_graph_data['user'] + '+' + public_graph_data['graph']
 
 	r.db(db_name).table(graphname).insert(public_graph_data).run()
 
@@ -412,7 +413,17 @@ def delete_graph(graphname):
 		return render_template('components/account_components/account_delete_graph.html', graphname=graphname)
 	elif request.method == "POST":
 		try:
-			r.db(current_user['site_id']).table_drop(graphname).run()
+			hashed_username = current_user['site_id']
+			access_key_public_graph = hashed_username + '+' + graphname
+			
+			r.db(hashed_username).table_drop(graphname).run() # delete from user's DB
+
+			pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(access_key_public_graph, index="access").run()
+			for d in pub_graph_cursor:
+				pub_graph_obj = d
+
+			r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get(pub_graph_obj['id']).delete().run() # delete from public graph DB
+
 			return jsonify(deleted=True)
 		except RqlRuntimeError:
 			return jsonify(deleted=False)
