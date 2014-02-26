@@ -9,6 +9,7 @@
 			<br>
 			<div class="col-md-4">
 				<p>Just add in your information, click "start" to prove you are a human, then finally click on register!</p>
+				<p><b>{{message}}</b></p>
 				<form method="post" class="form" action="{{ url_for('register')}}">
 					<div class="form-group">
 						{{ form.username(class_ = 'form-control', placeholder = form.username.label.text, required = true) }}

@@ -162,10 +162,8 @@ def register():
 					if email_user_object is not None:
 						if email_user_object['email'] == form['email']:
 							form = RegisterForm(request.form)
-							print "Email already exists!"
-							flash("Email already exists! Try again")
-
-							return render_template('register.html', form=form, ayah_html=ayah_html)
+							message = "Email already exists!"
+							return render_template('register.html', form=form, ayah_html=ayah_html, message=message)
 						else:
 							pass
 
@@ -178,10 +176,8 @@ def register():
 
 			except RqlRuntimeError:
 				form = RegisterForm(request.form)
-				print "Email already exists!"
-				flash("Email already exists! Try again")
-
-				return render_template('register.html', form=form, ayah_html=ayah_html)
+				message = "Email already exists!"
+				return render_template('register.html', form=form, ayah_html=ayah_html, message=message)
 
 			try:
 				# if this runs, DB already exists with email and we continue on
@@ -210,19 +206,15 @@ def register():
 								}
 				r.db(DB_EMAILS).table(T_EMAILS).insert(email_map_obj).run()
 
-				flash('Thanks for registering! Wanna login?')
-
 				return redirect(url_for('login'))
 			except RqlRuntimeError: 
 				form = RegisterForm(request.form)
-				print "Username already exists!"
-				flash("Email already exists! Try again")
-
-				return render_template('register.html', form=form, ayah_html=ayah_html)
+				message = "Username already exists! Please try again."
+				return render_template('register.html', form=form, ayah_html=ayah_html, message=message)
 		else:
-			print "You ain't no human!"
 			form = RegisterForm(request.form)
-			return render_template('register.html', form=form, ayah_html=ayah_html)
+			message = "You ain't no human! Please try again."
+			return render_template('register.html', form=form, ayah_html=ayah_html, message=message)
 
 
 	elif request.method == 'GET':
@@ -257,14 +249,13 @@ def login():
 				return redirect(url_for('account'))
 			else:
 				form = LoginForm(request.form)
-				print "incorrect username or password! try again"
-				flash("aww ye")
-				return render_template('login.html', form=form)
+				message = "Incorrect username or password! Please try again"
+				return render_template('login.html', form=form, message=message)
 
 		except RqlRuntimeError:
 			form = LoginForm(request.form)
-			print "incorrect username or password! try again"
-			return render_template('login.html', form=form)
+			message = "Incorrect username or password! Please try again"
+			return render_template('login.html', form=form, message=message)
 		
 	else:
 		form = LoginForm(request.form)                
