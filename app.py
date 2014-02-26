@@ -5,6 +5,8 @@ from forms import RegisterForm, LoginForm
 from werkzeug.contrib.fixers import ProxyFix
 from hash_helpers import hash_password, hash_username
 
+from datetime import datetime
+
 # from pprint import pprint as pretty
 
 import rethinkdb as r
@@ -191,6 +193,7 @@ def register():
 				new_user['username'] = form['username']
 				new_user['password'] = hash_password(form['username'], form['password'])
 				new_user['site_id'] = hashed_username # just the username hashed
+				new_user['date_registered'] = str(datetime.now())
 
 				r.db(DB_USERS).table_create(hashed_username).run()
 
