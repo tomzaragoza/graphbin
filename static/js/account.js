@@ -19,7 +19,8 @@ $("#createGraphButton").click(function(e) {
 
 	var thisButton = this;
 
-	if (input === '' || input.indexOf(" ") !== -1 || input.indexOf("-") !== -1) {
+
+	if (input === '' || input.indexOf(" ") !== -1) {
 		$("#response-box").html("<h1><small>Cannot be empty or contain spaces.</small></h1>");
 	} else {
 		$("#response-box").html("<h1><small>Loading...</small></h1>");
@@ -40,10 +41,13 @@ $("#createGraphButton").click(function(e) {
 
 									$("#response-box").html('<h1><small>Successfully added ' + input + '! </small></h1>');
 									$(thisButton).removeAttr("disabled");
+								},
+								error: function() {
+									$("#response-box").html("<h1><small>Cannot be empty or contain spaces. Name must also match A-Za-z0-9_</small></h1>");
 								}
 						});
 					}
-				}
+				},
 		});
 	}
 });

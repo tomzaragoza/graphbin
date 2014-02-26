@@ -19,7 +19,7 @@ $("#renameGraphButton").click(function() {
 
 	var thisButton = this;
 
-	if (input === '' || input.indexOf(" ") !== -1 || input.indexOf("-") !== -1) {
+	if (input === '' || input.indexOf(" ") !== -1) {
 		$("#response-box").html("<h1><small>Cannot be empty or contain spaces.</small></h1>");
 	} else {
 		$("#response-box").html("<h1><small>Loading...</small></h1>");
@@ -40,6 +40,9 @@ $("#renameGraphButton").click(function() {
 							loadGraphList(); // available in account.js
 							$("#response-box").html('<h1><small>Successfully renamed ' + oldGraphName + ' to ' + d.newName + '! </small></h1>');
 							$(thisButton).removeAttr("disabled");
+						},
+						error: function() {
+							$("#response-box").html("<h1><small>Cannot be empty or contain spaces. Name must match A-Za-z0-9_</small></h1>");
 						}
 					});
 				}

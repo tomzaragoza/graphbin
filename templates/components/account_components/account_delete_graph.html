@@ -6,7 +6,6 @@
 
 <script>
 $("button.yup").click(function() {
-	console.log("yup");
 	$.ajax({
 			type: "POST",
 			url: "/delete_graph/" + '{{graphname}}',

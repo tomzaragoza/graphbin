@@ -66,6 +66,9 @@ def dbSetup():
 		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_create("graph").run()
 		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_wait("graph").run()
 
+		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_create("access").run()
+		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_wait("access").run()
+
 		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_PUBLIC_GRAPHS)
 	except RqlRuntimeError:
 		print 'App database {0} already exists. Run the app without --setup'.format(DB_PUBLIC_GRAPHS)
@@ -409,11 +412,12 @@ def delete_graph(graphname):
 		try:
 			hashed_username = current_user['site_id']
 			access_key_public_graph = hashed_username + '+' + graphname
-			
+
 			r.db(hashed_username).table_drop(graphname).run() # delete from user's DB
 
 			pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(access_key_public_graph, index="access").run()
 			for d in pub_graph_cursor:
+				print d
 				pub_graph_obj = d
 
 			r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get(pub_graph_obj['id']).delete().run() # delete from public graph DB
