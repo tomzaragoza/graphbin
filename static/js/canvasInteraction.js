@@ -1,7 +1,7 @@
-var shift_f = false;
-var shift_t = false;
-var shift_delete = false;
-var shift_e = false;
+var select_s = false;
+var select_t = false;
+var select_delete = false;
+var select_e = false;
 var isEditing = false;
 
 // use this to grab the graph name being loaded
@@ -21,15 +21,15 @@ $("#viewport").mousedown(function(e){
 
 	if (nearestNode.node !== null && nearestNode.distance < 15){
 
-		if (shift_f === true) {
+		if (select_s === true) {
 			$("#source").html(nearestNode.node.name);
 		}
 
-		if (shift_t === true) {
+		if (select_t === true) {
 			$("#target").html(nearestNode.node.name);
 		}
 
-		if (shift_e === true) {
+		if (select_e === true) {
 			isEditing = true;
 			$("#node-label").val(nearestNode.node.data.label);
 			$("#node-name").val(nearestNode.node.name);
@@ -49,8 +49,8 @@ $("#viewport").mousedown(function(e){
 			edgesToDelete.push(edgeToInDB);
 		}
 
-		if (shift_delete === true) {
-			shift_delete = false;
+		if (select_delete === true) {
+			select_delete = false;
 			if (confirm("delete?")) {
 				var nodeNameToDelete = sys.getNode(nearestNode.node.name);
 				
@@ -111,23 +111,24 @@ $("#viewport").mouseup(function(e) {
 */
 $("#viewport").keydown(function(e){
 
-	if(e.shiftKey && e.keyCode == 70){
-		shift_f = true;
-	} else if(e.shiftKey && e.keyCode == 84){
-		shift_t = true;
-	} else if (e.shiftKey && e.keyCode == 68) {
-		shift_delete = true;
-	} else if (e.shiftKey && e.keyCode == 69) {
-		shift_e = true;
+	if(e.keyCode == 83){
+		select_s = true;
+	} else if(e.keyCode == 84){
+		select_t = true;
+	} else if (e.keyCode == 68) {
+		select_delete = true;
+	} else if (e.keyCode == 69) {
+		select_e = true;
 	}
 	e.preventDefault();
 });
 
 $("#viewport").keyup(function (e) {
-	shift_f = false;
-	shift_t = false;
-	shift_delete = false;
-	shift_e = false;
+	select_s = false;
+	select_t = false;
+	select_delete = false;
+	select_e = false;
+
 });
 
 
