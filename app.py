@@ -340,20 +340,26 @@ def public_graph(public_url):
 	""" Public load of the graphs that are saved in user accounts"""
 
 	pub_graph_data = None
-
+	nonregistered = False
 	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
 
 	if len(list(pub_graph_cursor)) == 0:
 		pub_graph_cursor = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
 		for doc in pub_graph_cursor:
 			pub_graph_data = doc
+		nonregistered = True
 
 	if pub_graph_data is not None:
 		graphname = pub_graph_data['graph']
-		site_id = pub_graph_data['user']
 
+		db_name = ''
+		if nonregistered:
+			db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
+		else:
+			db_name = pub_graph_data['user']
+		
 		all_nodes = []
-		cursor_nodes = r.db(site_id).table(graphname).filter(r.row["type"] == "node").run()
+		cursor_nodes = r.db(db_name).table(graphname).filter(r.row["type"] == "node").run()
 
 		for d in cursor_nodes:
 			del d['id']
@@ -369,7 +375,7 @@ def public_graph(public_url):
 			all_nodes.append(d)
 
 		all_edges =[]
-		cursor_edge = r.db(site_id).table(graphname).filter(r.row["type"] == "edge").run()
+		cursor_edge = r.db(db_name).table(graphname).filter(r.row["type"] == "edge").run()
 		for d in cursor_edge:
 			del d['id']
 			d['source'] = str(d['source'])
