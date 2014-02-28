@@ -14,8 +14,8 @@
 					<h1><b>GraphBin</b></h1>
 					<h3>Create your own graphs online for free.</h3>
 					{% if not logged_in %}
-				
-					<a class="btn btn-success btn-lg" href="#">Create a Graph</a>
+					<a class="btn btn-success btn-lg" id="createGraphIndex">Create a Graph</a>
+					<script type="text/javascript" src="/static/js/index.js"></script>
 					{% else %}
 					<p><a class="btn btn-primary btn-lg" href="/account">Your Account</a></p>
 					{% endif %}
@@ -29,21 +29,21 @@
 					<div class="row">
 						<center>
 						<div class="col-md-4">
-							<center><span class='glyphicon glyphicon-pencil' style="font-size: 150px;"></span></center>
+							<center><span class='glyphicon glyphicon-pencil' style="font-size: 120px;"></span></center>
 							<br>
 							<h3>Unlimited Graphs</h3>
 							<p>Make as many graphs as you'd like in your account.</p>
 						</div>
 						<div class="col-md-4">
 							<!-- <img src="/static/img/homepagegraph.png" class="img-responsive"> -->
-							<center><span class='glyphicon glyphicon-share' style="font-size: 150px;"></span></center>
+							<center><span class='glyphicon glyphicon-share' style="font-size: 120px;"></span></center>
 							<br>
 							<h3>Share Your Graphs</h3>
 							<p>Whether you're studying with others or asking a question online that requires a graph to visualize your problem, just make and share your graphs with the provided public url.</p>
 						</div>
 						<div class="col-md-4">
 							<!-- <img src="/static/img/save_icon.png" class="img-responsive"> -->
-							<center><span class='glyphicon glyphicon-save' style="font-size: 150px;"></span></center>
+							<center><span class='glyphicon glyphicon-save' style="font-size: 120px;"></span></center>
 							<br>
 							<h3>Register To Save Your Graphs</h3>
 							<p>You can make a new graph without registering, but if you have an account, you can save them all
@@ -92,7 +92,11 @@
 					<p></p>
 					<center>
 						<p>
-							Made with <span class="glyphicon glyphicon-heart-empty" alt="love"></span> in Toronto.
+							<b>Made with <span class="glyphicon glyphicon-heart-empty" alt="love"></span> in Toronto.</b>
+						</p>
+						<p>
+							Many thanks to <a href="http://glyphicons.com/">Glyphicons</a> for the amazing icons
+
 						</p>
 					</center>
 				</div>

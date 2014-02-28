@@ -29,14 +29,28 @@ login_manager.init_app(app)
 
 RDB_HOST =  os.environ.get('RDB_HOST') or 'localhost'
 RDB_PORT = os.environ.get('RDB_PORT') or 28015
-DB_MAIN = "graphbox"
-DB_USERS = "users"
-DB_EMAILS = "emails" # maps emails to usernames, if an email address is entered
-T_EMAILS = "emails_to_users"
-DB_PUBLIC_GRAPHS = "public_graphs"
-T_PUBLIC_GRAPHS = "url_to_graphs"
-rethink = r.connect("localhost", 28015).repl()
 
+# main graph database
+DB_MAIN = "graphbox"
+
+# main user database
+DB_USERS = "users"
+
+# maps emails to usernames, if an email address is entered
+DB_EMAILS = "emails"
+T_EMAILS = "emails_to_users"
+
+# contains the data for graphs that registered users have made
+DB_PUBLIC_GRAPHS = "public_graphs" 
+
+# contains data for graphs that non registered users have made
+DB_NONREGISTERED_PUBLIC_GRAPHS = "unregistered_public_graphs"
+
+# this will map to both the registered and unregistered public graphs
+# within their respective databases
+URL_TO_GRAPHS = "url_to_graphs"
+
+rethink = r.connect("localhost", 28015).repl()
 # ---------
 # DB setup
 # ---------
@@ -46,39 +60,57 @@ def dbSetup():
 	# All that matters is that DB_USERS is created
 	# Each account DB will be created after a user logs in.
 
-	# try:
-	# 	r.db_create(DB_MAIN).run(connection)
-	# 	# r.db(DB_MAIN).table_create('todos').run(connection)
-	# 	print 'Database {0} setup completed. Now run the app without --setup.'.format(DB_MAIN)
-	# except RqlRuntimeError:
-	# 	print 'App database {0} already exists. Run the app without --setup.'.format(DB_MAIN)
-
+	# Registered user's graph databases.
 	try:
 		r.db_create(DB_PUBLIC_GRAPHS).run(connection)
-		r.db(DB_PUBLIC_GRAPHS).table_create(T_PUBLIC_GRAPHS).run()
+		r.db(DB_PUBLIC_GRAPHS).table_create(URL_TO_GRAPHS).run()
 
-		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_create("url").run()
-		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_wait("url").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("url").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("url").run()
 
-		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_create("user").run()
-		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_wait("user").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("user").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("user").run()
 
-		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_create("graph").run()
-		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_wait("graph").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("graph").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("graph").run()
 
-		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_create("access").run()
-		r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).index_wait("access").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("access").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("access").run()
 
 		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_PUBLIC_GRAPHS)
 	except RqlRuntimeError:
 		print 'App database {0} already exists. Run the app without --setup'.format(DB_PUBLIC_GRAPHS)
 
+	# NonRegistered user's graph databases.
+	try:
+		r.db_create(DB_NONREGISTERED_PUBLIC_GRAPHS).run(connection)
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table_create(URL_TO_GRAPHS).run()
+
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("url").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("url").run()
+
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("user").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("user").run()
+
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("graph").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("graph").run()
+
+		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("access").run()
+		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("access").run()
+
+		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_PUBLIC_GRAPHS)
+	except RqlRuntimeError:
+		print 'App database {0} already exists. Run the app without --setup'.format(DB_PUBLIC_GRAPHS)
+
+
+	# User graph database
 	try:
 		r.db_create(DB_USERS).run(connection)
 		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_USERS)
 	except RqlRuntimeError:
 		print 'App database {0} already exists. Run the app without --setup'.format(DB_USERS)
 
+	# User email database
 	try:
 		r.db_create(DB_EMAILS).run(connection)
 		print "created DB EMAILS"
@@ -305,11 +337,16 @@ def account():
 
 @app.route('/public_load/<public_url>', methods=["GET"])
 def public_graph(public_url):
+	""" Public load of the graphs that are saved in user accounts"""
 
-	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(public_url, index="url").run()
+	pub_graph_data = None
 
-	for doc in pub_graph_cursor:
-		pub_graph_data = doc
+	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
+
+	if len(list(pub_graph_cursor)) == 0:
+		pub_graph_cursor = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
+		for doc in pub_graph_cursor:
+			pub_graph_data = doc
 
 	if pub_graph_data is not None:
 		graphname = pub_graph_data['graph']
@@ -340,22 +377,67 @@ def public_graph(public_url):
 			all_edges.append(d)
 
 		return jsonify(nodes=all_nodes, edges=all_edges)
+	else:
+		return "Nothing at this address..."
 
 
 @app.route('/<public_url>', methods=["GET"])
 def public_load(public_url):
 
-	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(public_url, index="url").run()
-	num_of_graphs = len(list(pub_graph_cursor))
-	if num_of_graphs == 0:
-		return "Nothing at that address..."
-	elif num_of_graphs > 0:
+	# try graphs that are public and stored in a user account.
+	pub_graph_cursor_registered = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
+	num_of_graphs = len(list(pub_graph_cursor_registered))
+	if num_of_graphs > 0:
 		return render_template('graph_public.html', url=public_url)
+	
+	pub_graph_cursor_nonregistered = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
+	num_of_graphs = len(list(pub_graph_cursor_nonregistered))
+	if num_of_graphs > 0:
+		return render_template('graph_public.html', url=public_url)
+	# if num_of_graphs == 0:
+	return "Nothing at that address..." #at leasts in public, stored in user account
+
+
+@app.route('/nonregistered_create_graph', methods=["POST"])
+def nonregistered_create_graph():
+	""" """
+	""" Create a graph for users who are not registered """
+	try:
+		public_association = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(8))
+		print "created public_association"
+		unregistered_graph_data = {
+									'url': public_association,
+									'graph': public_association,
+									'type': 'mapping',
+									'date_created': str(datetime.now())
+								} # note that we don't need a user since we are not logged in
+
+		# insertion of the url to graphs data above
+		# add in a check if the particular url already exists
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).insert(unregistered_graph_data).run()
+		print "created url to graphs"
+
+		# creation of the graph data
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table_create(public_association).run()
+		print "created table"
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("type").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("type").run()
+		print "created type index"
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("node_name").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("node_name").run()
+		print "created node_name index"
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("edge_name").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("edge_name").run()
+		print "created edge_name index"
+		return jsonify(created=True, url=unregistered_graph_data['url'])
+	except:
+		print "except"
+		return jsonify(created=False)
 
 @app.route('/create_graph/<graphname>', methods=["POST"])
 @login_required
 def create_graph(graphname):
-	""" Create the graph with the given graphname"""
+	""" Create the graph with the given graphname """
 	db_name = current_user['site_id']
 	public_association = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(8))
 
@@ -381,7 +463,7 @@ def create_graph(graphname):
 	r.db(db_name).table(graphname).index_wait("edge_name").run()
 
 	# create table for user in public graphs
-	r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).insert(public_graph_data).run()
+	r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).insert(public_graph_data).run()
 
 	return jsonify(exists=True)
 
@@ -415,12 +497,12 @@ def delete_graph(graphname):
 
 			r.db(hashed_username).table_drop(graphname).run() # delete from user's DB
 
-			pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(access_key_public_graph, index="access").run()
+			pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(access_key_public_graph, index="access").run()
 			for d in pub_graph_cursor:
 				print d
 				pub_graph_obj = d
 
-			r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get(pub_graph_obj['id']).delete().run() # delete from public graph DB
+			r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get(pub_graph_obj['id']).delete().run() # delete from public graph DB
 
 			return jsonify(deleted=True)
 		except RqlRuntimeError:
@@ -428,6 +510,7 @@ def delete_graph(graphname):
 
 
 @app.route('/graph_settings/<graphname>', methods=["GET"])
+@login_required
 def graph_settings(graphname):
 	""" 
 		Load the prompt for settings in the graph. 
@@ -436,6 +519,7 @@ def graph_settings(graphname):
 
 
 @app.route('/rename_graph/<old_graphname>', methods=["POST"])
+@login_required
 def rename_graph(old_graphname):
 	""" 
 		Rename the selected graph
@@ -450,12 +534,12 @@ def rename_graph(old_graphname):
 	r.db(db_name).table_drop(old_graphname).run()
 
 	# Update in DB_PUBLIC_GRAPHS
-	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(access_key_public_graph, index="access").run()
+	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(access_key_public_graph, index="access").run()
 
 	new_access_data = {
 						'access': db_name + '+' + new_name
 					}
-	r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).filter(r.row['access'] == access_key_public_graph).update(new_access_data).run()
+	r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).filter(r.row['access'] == access_key_public_graph).update(new_access_data).run()
 	#get_all(access_key_public_graph, index="access").run()
 
 	# for d in pub_graph_cursor:
@@ -464,16 +548,34 @@ def rename_graph(old_graphname):
 
 	return jsonify(newName=new_name)
 
+@app.route('/graph_nonregistered/<graphname>') #note that graphname = public_association
+def graph_nonregistered(graphname):
+	""" 
+		Load the graph page if there is no user logged in.
+	"""
+	try:
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).run() # if the runs, graphname exists
+
+		pub_graph_cursor_noregistered = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(graphname, index="graph").run()
+		for d in pub_graph_cursor_noregistered:
+			pub_graph_nonregistered_obj = d
+
+		return render_template('graph.html', pub_url=pub_graph_nonregistered_obj['url'])
+	except RqlRuntimeError:
+		return "Error: Graph '{0}' does not exist".format(graphname)
+
+
+
 @app.route('/graph/<graphname>')
 @login_required
 def graph(graphname):
 	""" 
-		Loads the graph page.
+		Loads the graph page if the user is logged in.
 	"""
 	try:
 		r.db(current_user['site_id']).table(graphname).run() # if this runs, graphname exists
 
-		pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(T_PUBLIC_GRAPHS).get_all(graphname, index="graph").run()
+		pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(graphname, index="graph").run()
 		for d in pub_graph_cursor:
 			pub_graph_obj = d
 		return render_template('graph.html', pub_url=pub_graph_obj['url'])
@@ -512,13 +614,23 @@ def store(graphname):
 		if "y" in request.form:
 			node_info['y'] = request.form["y"]
 
-		cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).run()
+		db_name = ''
+		try:
+			# logged in user
+			cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).run()
+			db_name = current_user['site_id']
+		except RqlRuntimeError:
+			# nonregistered / logged in user
+			print "Not a graph of a user, try public nonregistered graph"
+			cursor = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).filter(r.row["node_name"] == node_name).run()
+			db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
+
 		if len(list(cursor)) == 0:
 			print "Insert node {0}".format(node_name)
-			r.db(current_user['site_id']).table(graphname).insert(node_info).run()
+			r.db(db_name).table(graphname).insert(node_info).run()
 		else:
 			print "Update node {0}".format(node_name)
-			r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).update(node_info).run()
+			r.db(db_name).table(graphname).filter(r.row["node_name"] == node_name).update(node_info).run()
 
 	elif request.form['type'] == 'edge':
 		print "Storing edge to DB..."
@@ -533,27 +645,43 @@ def store(graphname):
 						"type": "edge"
 					}
 
-		cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["edge_name"] == edge_name).run()
+		db_name = ''
+		try:
+			cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["edge_name"] == edge_name).run()
+			db_name = current_user['site_id']
+		except RqlRuntimeError:
+			cursor = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).filter(r.row["edge_name"] == edge_name).run()
+			db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
+		
 		if len(list(cursor)) == 0:
 			print "Inserting edge {0}".format(edge_name)
-			r.db(current_user['site_id']).table(graphname).insert(edge_info).run()
+			r.db(db_name).table(graphname).insert(edge_info).run()
 		else:
 			print "Updating edge {0}".format(edge_name)
-			r.db(current_user['site_id']).table(graphname).filter(r.row["edge_name"] == edge_name).update(edge_info).run()
+			r.db(db_name).table(graphname).filter(r.row["edge_name"] == edge_name).update(edge_info).run()
 
 
 	return "stored {0} successfully".format(request.form['type'])
 
 
 @app.route('/load/<graphname>', methods=["GET"])
-@login_required
 def load(graphname):
 	""" 
 		Load each node, edge information.
 	"""
 
 	all_nodes = []
-	cursor_nodes = r.db(current_user['site_id']).table(graphname).filter(r.row["type"] == "node").run()
+
+	db_name = ''
+	try:
+		cursor_nodes = r.db(current_user['site_id']).table(graphname).filter(r.row["type"] == "node").run()
+		db_name = current_user['site_id']
+	except:
+		cursor_nodes = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).filter(r.row["type"] == "node").run()
+		db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
+
+	print "in load, the db being used is " + db_name
+
 	for d in cursor_nodes:
 		del d['id']
 		d['node_name'] = str(d['node_name'])
@@ -568,8 +696,8 @@ def load(graphname):
 		all_nodes.append(d)
 	
 	all_edges =[]
-	cursor_edge = r.db(current_user['site_id']).table(graphname).filter(r.row["type"] == "edge").run()
-	for d in cursor_edge:
+	cursor_edges = r.db(db_name).table(graphname).filter(r.row["type"] == "edge").run() # db_name is set and determined above
+	for d in cursor_edges:
 		del d['id']
 		d['source'] = str(d['source'])
 		d['target'] = str(d['target'])
@@ -579,7 +707,6 @@ def load(graphname):
 
 
 @app.route('/delete_node/<graphname>', methods=["POST"])
-@login_required
 def delete_node(graphname):
 	""" 
 		Delete node from database
@@ -588,15 +715,22 @@ def delete_node(graphname):
 	node_name = request.form["node_name"]
 	edges_to_delete = request.form["edges_to_delete"].split(',')
 
-	for edge_name in edges_to_delete:
-		r.db(current_user['site_id']).table(graphname).filter(r.row["edge_name"] == edge_name).delete().run()
+	db_name = ''
+	try:
+		r.db(current_user['site_id']).table(graphname).run()
+		db_name = current_user['site_id']
+	except:
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).run()
+		db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
 
-	r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).delete().run()
+	for edge_name in edges_to_delete:
+		r.db(db_name).table(graphname).filter(r.row["edge_name"] == edge_name).delete().run()
+
+	r.db(db_name).table(graphname).filter(r.row["node_name"] == node_name).delete().run()
 
 	return "succesfully deleted node {0} and its edges".format(node_name)
 
 @app.route('/delete_edge/<graphname>', methods=["POST"])
-@login_required
 def delete_edge(graphname):
 	""" 
 		Delete the edges in the DB.
@@ -609,7 +743,14 @@ def delete_edge(graphname):
 	edge_name_deleted = False
 	reversed_edge_name_deleted = False
 
-	db_name = current_user['site_id']
+	db_name = '' #current_user['site_id']
+	try:
+		r.db(current_user['site_id']).table(graphname).run()
+		db_name = current_user['site_id']
+	except:
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).run()
+		db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
+
 	# Try first for the edge_name of the selected nodes in order
 	try:
 		r.db(db_name).table(graphname).filter(r.row['edge_name'] == edge_name).delete().run()
