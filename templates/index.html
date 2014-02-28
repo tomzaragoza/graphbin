@@ -13,10 +13,9 @@
 					<center>
 					<h1><b>GraphBin</b></h1>
 					<h3>Create your own graphs online for free.</h3>
-
 					{% if not logged_in %}
-					<a class="btn btn-primary btn-lg" href="/login">Login</a>
-					<a class="btn btn-primary btn-lg" href="/register">Register</a>
+				
+					<a class="btn btn-success btn-lg" href="#">Create a Graph</a>
 					{% else %}
 					<p><a class="btn btn-primary btn-lg" href="/account">Your Account</a></p>
 					{% endif %}
@@ -40,8 +39,10 @@
 							<p>Whether you're studying with others or asking a question online that requires a graph to visualize your problem, just make and share your graphs with the provided public url.</p>
 						</div>
 						<div class="col-md-4">
-							<img src="/static/img/free.png" class="img-responsive">
-							<h3>It's Free!</h3>
+							<img src="/static/img/save_icon.png" class="img-responsive">
+							<h3>Register an account to save your graphs</h3>
+							<a class="btn btn-primary btn-lg" href="/login">Login</a>
+							<a class="btn btn-primary btn-lg" href="/register">Register</a>
 						</div>
 						</center>
 					</div>
