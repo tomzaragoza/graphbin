@@ -7,7 +7,7 @@ var isEditing = false;
 // use this to grab the graph name being loaded
 var pathname = window.location.pathname.split('/');
 var graphname = pathname[pathname.length -1];
-console.log(graphname);
+
 $("#graphname-header").html(graphname);
 
 /*
@@ -260,8 +260,6 @@ $("#addOrEditNode").click(function(e) {
 				url: "/store/" + graphname,
 				data: params,
 				success: function(d) {
-					console.log(d);
-					console.log("store success");
 				}
 		});
 	}
@@ -288,7 +286,6 @@ $("#addEdge").click(function(e) {
 				url: "/store/" + graphname,
 				data: params,
 				success: function(d) {
-					console.log(d);
 					$("#source").empty();
 					$("#target").empty();
 				}
@@ -302,7 +299,6 @@ $("#addEdge").click(function(e) {
 
 
 $("#deleteEdge").click(function(e) {
-	console.log("deleteEdge clicked");
 	var n_source_name = $("#source").html();
 	var n_target_name = $("#target").html();
 

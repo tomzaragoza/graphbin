@@ -426,12 +426,14 @@ def nonregistered_create_graph():
 	""" Create a graph for users who are not registered """
 	try:
 		public_association = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(8))
+
 		print "created public_association"
 		unregistered_graph_data = {
 									'url': public_association,
 									'graph': public_association,
 									'type': 'mapping',
-									'date_created': str(datetime.now())
+									'date_created': str(datetime.now()),
+									'previously_edited': False
 								} # note that we don't need a user since we are not logged in
 
 		# insertion of the url to graphs data above
@@ -582,7 +584,11 @@ def graph_nonregistered(graphname):
 		for d in pub_graph_cursor_noregistered:
 			pub_graph_nonregistered_obj = d
 
-		return render_template('graph_nonregistered.html', pub_url=pub_graph_nonregistered_obj['url'])
+		if not pub_graph_nonregistered_obj['previously_edited']:
+			r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(graphname, index="graph").update({'previously_edited': True}).run()
+			return render_template('graph_nonregistered.html', pub_url=pub_graph_nonregistered_obj['url'])
+		else:
+			return "Cannot edit the nodes of this graph anymore! Create an account to save and edit your graphs."
 	except RqlRuntimeError:
 		return "Error: Graph '{0}' does not exist".format(graphname)
 

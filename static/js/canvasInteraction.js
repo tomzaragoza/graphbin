@@ -7,7 +7,7 @@ var isEditing = false;
 // use this to grab the graph name being loaded
 var pathname = window.location.pathname.split('/');
 var graphname = pathname[pathname.length -1];
-console.log(graphname);
+
 $("#graphname-header").html(graphname);
 
 /*
@@ -204,7 +204,6 @@ $("#selectionMode").click(function(e) {
 
 
 $("#addOrEditNode").click(function(e) {
-	console.log("add or edit node from logged in user");
 	var nodeLabel = $("#node-label").val();
 	var nodeName = $("#node-name").val();
 	var canCreateNode = false;
@@ -286,7 +285,6 @@ $("#addEdge").click(function(e) {
 				url: "/store/" + graphname,
 				data: params,
 				success: function(d) {
-					console.log(d);
 					$("#source").empty();
 					$("#target").empty();
 				}
