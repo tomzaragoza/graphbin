@@ -344,9 +344,6 @@ def public_graph(public_url):
 	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
 	pub_graph_list = list(pub_graph_cursor)
 
-	print "Wat"
-	print pub_graph_list
-
 	if len(pub_graph_list) == 0:
 		pub_graph_cursor_nonregistered = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
 		for doc in list(pub_graph_cursor_nonregistered):
@@ -355,8 +352,6 @@ def public_graph(public_url):
 	else:
 		for doc in pub_graph_list:
 			pub_graph_data = doc
-
-	print pub_graph_data
 
 	if pub_graph_data is not None:
 		graphname = pub_graph_data['graph']
@@ -587,7 +582,7 @@ def graph_nonregistered(graphname):
 		for d in pub_graph_cursor_noregistered:
 			pub_graph_nonregistered_obj = d
 
-		return render_template('graph.html', pub_url=pub_graph_nonregistered_obj['url'])
+		return render_template('graph_nonregistered.html', pub_url=pub_graph_nonregistered_obj['url'])
 	except RqlRuntimeError:
 		return "Error: Graph '{0}' does not exist".format(graphname)
 
@@ -611,7 +606,6 @@ def graph(graphname):
 
 
 @app.route('/store/<graphname>', methods=["POST"])
-@login_required
 def store(graphname):
 	""" 
 		Store the node, edge into the DB. 
@@ -647,7 +641,7 @@ def store(graphname):
 			# logged in user
 			cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["node_name"] == node_name).run()
 			db_name = current_user['site_id']
-		except RqlRuntimeError:
+		except:
 			# nonregistered / logged in user
 			print "Not a graph of a user, try public nonregistered graph"
 			cursor = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).filter(r.row["node_name"] == node_name).run()
@@ -677,7 +671,7 @@ def store(graphname):
 		try:
 			cursor = r.db(current_user['site_id']).table(graphname).filter(r.row["edge_name"] == edge_name).run()
 			db_name = current_user['site_id']
-		except RqlRuntimeError:
+		except:
 			cursor = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).filter(r.row["edge_name"] == edge_name).run()
 			db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
 		
@@ -709,8 +703,10 @@ def load(graphname):
 		db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
 
 	print "in load, the db being used is " + db_name
-
+	# nodes_list = list(cursor_nodes)
+	# print nodes_list
 	for d in cursor_nodes:
+		print d
 		del d['id']
 		d['node_name'] = str(d['node_name'])
 		d['color'] = str(d['color'])

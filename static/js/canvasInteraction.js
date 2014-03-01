@@ -204,7 +204,7 @@ $("#selectionMode").click(function(e) {
 
 
 $("#addOrEditNode").click(function(e) {
-
+	console.log("add or edit node from logged in user");
 	var nodeLabel = $("#node-label").val();
 	var nodeName = $("#node-name").val();
 	var canCreateNode = false;
@@ -259,7 +259,7 @@ $("#addOrEditNode").click(function(e) {
 				type: "POST",
 				url: "/store/" + graphname,
 				data: params,
-				success: function(data) {
+				success: function(d) {
 				}
 		});
 	}

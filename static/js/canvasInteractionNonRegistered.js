@@ -204,7 +204,7 @@ $("#selectionMode").click(function(e) {
 
 
 $("#addOrEditNode").click(function(e) {
-
+	console.log("add or edit");
 	var nodeLabel = $("#node-label").val();
 	var nodeName = $("#node-name").val();
 	var canCreateNode = false;
@@ -259,7 +259,9 @@ $("#addOrEditNode").click(function(e) {
 				type: "POST",
 				url: "/store/" + graphname,
 				data: params,
-				success: function(data) {
+				success: function(d) {
+					console.log(d);
+					console.log("store success");
 				}
 		});
 	}
@@ -285,8 +287,8 @@ $("#addEdge").click(function(e) {
 				type: "POST",
 				url: "/store/" + graphname,
 				data: params,
-				success: function(data) {
-					console.log(data);
+				success: function(d) {
+					console.log(d);
 					$("#source").empty();
 					$("#target").empty();
 				}
