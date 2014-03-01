@@ -15,6 +15,7 @@
 					<h3>Create your own graphs online for free.</h3>
 					{% if not logged_in %}
 					<a class="btn btn-success btn-lg" id="createGraphIndex">Create A Graph Now</a>
+					<div id="loading"></div>
 					<script type="text/javascript" src="/static/js/index.js"></script>
 					{% else %}
 					<p><a class="btn btn-primary btn-lg" href="/account">Your Account</a></p>
@@ -35,14 +36,12 @@
 							<p>Make as many graphs as you'd like in your account.</p>
 						</div>
 						<div class="col-md-4">
-							<!-- <img src="/static/img/homepagegraph.png" class="img-responsive"> -->
 							<center><span class='glyphicon glyphicon-share' style="font-size: 120px;"></span></center>
 							<br>
 							<h3>Share Your Graphs</h3>
 							<p>Whether you're studying with others or asking a question online that requires a graph to visualize your problem, just make and share your graphs with the provided public url.</p>
 						</div>
 						<div class="col-md-4">
-							<!-- <img src="/static/img/save_icon.png" class="img-responsive"> -->
 							<center><span class='glyphicon glyphicon-save' style="font-size: 120px;"></span></center>
 							<br>
 							<h3>Register To Save and Edit Your Graphs</h3>

@@ -1,5 +1,5 @@
 $("#createGraphIndex").click(function(e) {
-	console.log("clicked");
+	$("#loading").html("<p>Creating an empty graph. You'll be redirected to it...</p>");
 	$.ajax({
 				type: "POST",
 				url: "/nonregistered_create_graph",
