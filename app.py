@@ -401,8 +401,6 @@ def public_load(public_url):
 
 	if num_of_graphs > 0:
 		for d in returned_graph_list:
-			print "in public db"
-			print d
 			pub_graph_registered_obj = d
 		return render_template('graph_public.html', url=pub_graph_registered_obj['url'])
 	
@@ -412,8 +410,6 @@ def public_load(public_url):
 
 	if num_of_graphs > 0:
 		for d in returned_graph_list:
-			print "in public db non registered"
-			print d
 			pub_graph_nonregistered_obj = d
 		return render_template('graph_public.html', url=pub_graph_nonregistered_obj['url'])
 
@@ -427,7 +423,6 @@ def nonregistered_create_graph():
 	try:
 		public_association = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(8))
 
-		print "created public_association"
 		unregistered_graph_data = {
 									'url': public_association,
 									'graph': public_association,
@@ -439,23 +434,21 @@ def nonregistered_create_graph():
 		# insertion of the url to graphs data above
 		# add in a check if the particular url already exists
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).insert(unregistered_graph_data).run()
-		print "created url to graphs"
 
 		# creation of the graph data
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table_create(public_association).run()
-		print "created table"
+
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("type").run()
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("type").run()
-		print "created type index"
+
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("node_name").run()
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("node_name").run()
-		print "created node_name index"
+
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("edge_name").run()
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("edge_name").run()
-		print "created edge_name index"
+
 		return jsonify(created=True, url=unregistered_graph_data['url'])
 	except:
-		print "except"
 		return jsonify(created=False)
 
 @app.route('/create_graph/<graphname>', methods=["POST"])
@@ -523,7 +516,6 @@ def delete_graph(graphname):
 
 			pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(access_key_public_graph, index="access").run()
 			for d in pub_graph_cursor:
-				print d
 				pub_graph_obj = d
 
 			r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get(pub_graph_obj['id']).delete().run() # delete from public graph DB
@@ -588,7 +580,7 @@ def graph_nonregistered(graphname):
 			r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(graphname, index="graph").update({'previously_edited': True}).run()
 			return render_template('graph_nonregistered.html', pub_url=pub_graph_nonregistered_obj['url'])
 		else:
-			return "Cannot edit the nodes of this graph anymore! Create an account to save and edit your graphs."
+			return redirect(url_for('index'))
 	except RqlRuntimeError:
 		return "Error: Graph '{0}' does not exist".format(graphname)
 
@@ -618,7 +610,7 @@ def store(graphname):
 		Will act as a function to update the coordinates 
 		of the nodes as well.
 	"""
-	print "we in the store method"
+
 	if request.form['type'] == 'node':
 		print "Storing node to DB..."
 		label = request.form["label"]
@@ -649,7 +641,6 @@ def store(graphname):
 			db_name = current_user['site_id']
 		except:
 			# nonregistered / logged in user
-			print "Not a graph of a user, try public nonregistered graph"
 			cursor = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).filter(r.row["node_name"] == node_name).run()
 			db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
 
@@ -708,11 +699,7 @@ def load(graphname):
 		cursor_nodes = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).filter(r.row["type"] == "node").run()
 		db_name = DB_NONREGISTERED_PUBLIC_GRAPHS
 
-	print "in load, the db being used is " + db_name
-	# nodes_list = list(cursor_nodes)
-	# print nodes_list
 	for d in cursor_nodes:
-		print d
 		del d['id']
 		d['node_name'] = str(d['node_name'])
 		d['color'] = str(d['color'])
