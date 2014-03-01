@@ -44,7 +44,7 @@ T_EMAILS = "emails_to_users"
 DB_PUBLIC_GRAPHS = "public_graphs" 
 
 # contains data for graphs that non registered users have made
-DB_NONREGISTERED_PUBLIC_GRAPHS = "unregistered_public_graphs"
+DB_NONREGISTERED_PUBLIC_GRAPHS = "nonregistered_public_graphs"
 
 # this will map to both the registered and unregistered public graphs
 # within their respective databases
