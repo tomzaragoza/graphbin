@@ -342,12 +342,21 @@ def public_graph(public_url):
 	pub_graph_data = None
 	nonregistered = False
 	pub_graph_cursor = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
+	pub_graph_list = list(pub_graph_cursor)
 
-	if len(list(pub_graph_cursor)) == 0:
-		pub_graph_cursor = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
-		for doc in pub_graph_cursor:
+	print "Wat"
+	print pub_graph_list
+
+	if len(pub_graph_list) == 0:
+		pub_graph_cursor_nonregistered = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
+		for doc in list(pub_graph_cursor_nonregistered):
 			pub_graph_data = doc
 		nonregistered = True
+	else:
+		for doc in pub_graph_list:
+			pub_graph_data = doc
+
+	print pub_graph_data
 
 	if pub_graph_data is not None:
 		graphname = pub_graph_data['graph']
@@ -389,18 +398,30 @@ def public_graph(public_url):
 
 @app.route('/<public_url>', methods=["GET"])
 def public_load(public_url):
-
+	print "in public load"
 	# try graphs that are public and stored in a user account.
 	pub_graph_cursor_registered = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
-	num_of_graphs = len(list(pub_graph_cursor_registered))
+	returned_graph_list = list(pub_graph_cursor_registered)
+	num_of_graphs = len(returned_graph_list)
+
 	if num_of_graphs > 0:
-		return render_template('graph_public.html', url=public_url)
+		for d in returned_graph_list:
+			print "in public db"
+			print d
+			pub_graph_registered_obj = d
+		return render_template('graph_public.html', url=pub_graph_registered_obj['url'])
 	
 	pub_graph_cursor_nonregistered = r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
-	num_of_graphs = len(list(pub_graph_cursor_nonregistered))
+	returned_graph_list = list(pub_graph_cursor_nonregistered)
+	num_of_graphs = len(returned_graph_list)
+
 	if num_of_graphs > 0:
-		return render_template('graph_public.html', url=public_url)
-	# if num_of_graphs == 0:
+		for d in returned_graph_list:
+			print "in public db non registered"
+			print d
+			pub_graph_nonregistered_obj = d
+		return render_template('graph_public.html', url=pub_graph_nonregistered_obj['url'])
+
 	return "Nothing at that address..." #at leasts in public, stored in user account
 
 
@@ -597,6 +618,7 @@ def store(graphname):
 		Will act as a function to update the coordinates 
 		of the nodes as well.
 	"""
+	print "we in the store method"
 	if request.form['type'] == 'node':
 		print "Storing node to DB..."
 		label = request.form["label"]

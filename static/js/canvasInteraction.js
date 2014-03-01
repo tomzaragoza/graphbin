@@ -285,8 +285,8 @@ $("#addEdge").click(function(e) {
 				type: "POST",
 				url: "/store/" + graphname,
 				data: params,
-				success: function(data) {
-					console.log(data);
+				success: function(d) {
+					console.log(d);
 					$("#source").empty();
 					$("#target").empty();
 				}
