@@ -15,7 +15,7 @@
 					<h3>Create your own graphs online for free.</h3>
 					{% if not logged_in %}
 					<a class="btn btn-success btn-lg" id="createGraphIndex">Create A Graph Now</a>
-					<div id="loading"></div>
+					<span id="loading"></span>
 					<script type="text/javascript" src="/static/js/index.js"></script>
 					{% else %}
 					<p><a class="btn btn-primary btn-lg" href="/account">Your Account</a></p>
@@ -32,8 +32,8 @@
 						<div class="col-md-4">
 							<center><span class='glyphicon glyphicon-pencil' style="font-size: 120px;"></span></center>
 							<br>
-							<h3>Unlimited Graphs</h3>
-							<p>Make as many graphs as you'd like in your account.</p>
+							<h3>Examples</h3>
+							<p>Make a <a href="https://graphbin.co/aOYeR2hf">Binary Search Tree</a>, <a target='_blank' href="https://graphbin.co/NtX2oJFj">Disjoint Sets</a>, or <a href="https://graphbin.co/Birsstqi" target="_blank">a mess.</a></p>
 						</div>
 						<div class="col-md-4">
 							<center><span class='glyphicon glyphicon-share' style="font-size: 120px;"></span></center>
@@ -46,14 +46,16 @@
 							<br>
 							<h3>Register To Save and Edit Your Graphs</h3>
 							<p>You can make a new graph without registering, but if you have an account, you can save and edit the graphs that you make.</p>
+							{% if not logged_in %}
 							<a class="btn btn-primary btn-lg" href="/login">Login</a>
 							<a class="btn btn-primary btn-lg" href="/register">Register</a>
+							{% endif %}
 						</div>
 						</center>
 					</div>
 
 					<!-- Carousel For Screenshots -->
-<!-- 					<center></center><h3>Some Screenshots</h3></center>
+					<!-- <center></center><h3>Some Screenshots</h3></center>
 					<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
 					  <ol class="carousel-indicators">
 					    <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>

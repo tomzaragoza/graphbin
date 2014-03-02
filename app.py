@@ -393,7 +393,7 @@ def public_graph(public_url):
 
 @app.route('/<public_url>', methods=["GET"])
 def public_load(public_url):
-	print "in public load"
+
 	# try graphs that are public and stored in a user account.
 	pub_graph_cursor_registered = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
 	returned_graph_list = list(pub_graph_cursor_registered)
