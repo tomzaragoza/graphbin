@@ -7,9 +7,9 @@ $("#createGraphIndex").click(function(e) {
 				url: "/nonregistered_create_graph",
 				success: function(d) {
 					if (d.created) {
-						window.location = "https://graphbin.co/graph_nonregistered/" + d.url;
+						window.location = "http://graphbin.co/graph_nonregistered/" + d.url;
 					} else if (d.created === false) {
-						window.location = "https://graphbin.co/";
+						window.location = "http://graphbin.co/";
 					}
 				},
 				error: function(e) {
