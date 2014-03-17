@@ -6,13 +6,18 @@
 				<script type="text/javascript" src="/static/arbor/demos/halfviz/src/renderer.js" ></script>
 				<link rel="stylesheet" href="/static/css/bootstrap.min.css"></script>
 				<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+				<title>
+					GraphBin - Create Graphs (edges and vertices) online
+				</title>
+				<meta name="description" content="PasteBin for Graphs (as in graph theory)."/>
+				<meta name="description" content="Create graphs (as in graph theory) online for free and share them."/>
 		</head>
 		<body>
 			<div class="jumbotron" style="background: #eeeeee;">
 				<div class="container">
 					<center>
 					<h1><b>GraphBin</b></h1>
-					<h3>Create your own graphs online for free.</h3>
+					<h2>Create your own graphs online for free.</h2>
 					{% if not logged_in %}
 					<a class="btn btn-success btn-lg" id="createGraphIndex">Create A Graph Now</a>
 					<span id="loading"></span>
