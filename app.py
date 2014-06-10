@@ -7,8 +7,6 @@ from hash_helpers import hash_password, hash_username
 
 from datetime import datetime
 
-# from pprint import pprint as pretty
-
 import rethinkdb as r
 from rethinkdb.errors import RqlRuntimeError
 
@@ -55,6 +53,11 @@ rethink = r.connect("localhost", 28015).repl()
 # DB setup
 # ---------
 def dbSetup():
+	""" 
+		When running the GraphBin app for the first time,
+		this function will create all databases, tables, and indicies.
+	"""
+
 	connection = r.connect(host=RDB_HOST, port=RDB_PORT)
 
 	# All that matters is that DB_USERS is created
@@ -95,9 +98,6 @@ def dbSetup():
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("graph").run()
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("graph").run()
 
-		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("access").run()
-		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("access").run()
-
 		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_PUBLIC_GRAPHS)
 	except RqlRuntimeError:
 		print 'App database {0} already exists. Run the app without --setup'.format(DB_PUBLIC_GRAPHS)
@@ -129,8 +129,9 @@ def dbSetup():
 	finally:
 		connection.close()
 
+
 # -------------
-# Login stuff
+# Login helper functions
 # -------------
 @app.before_request
 def before_request():
@@ -138,6 +139,11 @@ def before_request():
 
 
 def load_user_from_db(user_object):
+	""" 
+		Retrieve the user information from user_object
+		and return the User object for use in Login/Registration.
+	"""
+
 	user = User()
 	user.user_id = user_object['user_id']
 	user.password = user_object['password']
@@ -149,6 +155,11 @@ def load_user_from_db(user_object):
 
 @login_manager.user_loader
 def load_user(userid):
+	""" 
+		Given userid, load the user object from the
+		database.
+	"""
+
 	user_object = None
 	hashed_username = hash_username(userid)
 
@@ -159,7 +170,7 @@ def load_user(userid):
 	user_session_object = load_user_from_db(user_object)
 
 	if type(user_object) != None and type(user_session_object) != None:
-		return user_session_object#.get_id()
+		return user_session_object
 
 
 # -------------------------
@@ -167,6 +178,10 @@ def load_user(userid):
 # -------------------------
 @app.route('/register', methods=['POST', 'GET'])
 def register():
+	""" 
+		The register view. Renders the register form when requested
+		and performs the registration process when submitted.
+	"""
 	ayah_html = ayah.get_publisher_html()
 
 	if request.method == 'POST':
@@ -180,17 +195,12 @@ def register():
 
 			# check if the email exists already in the DB.
 			try:
-				# if len(form['email']) == 0:
-				# 	raise RqlRuntimeError # this is because we can't create a DB with empty string
 
 				email_user_object = None
 				email_user_cursor = r.db(DB_EMAILS).table(T_EMAILS).get_all(form['email'], index="email").run()
 				for d in email_user_cursor:
 					email_user_object = d
 
-
-				# r.db(DB_EMAILS).table(T_EMAILS).get_all
-				# cases: crashes when empty, or exists
 				if len(form['email']) == 0:
 					pass
 				elif len(form['email']) > 0:
@@ -201,13 +211,6 @@ def register():
 							return render_template('register.html', form=form, ayah_html=ayah_html, message=message)
 						else:
 							pass
-
-				# else:
-				# 	email_map_obj = {
-				# 					'username': form['username'],
-				# 					'email': form['email']
-				# 				}
-				# 	r.db(DB_EMAILS).table(T_EMAILS).insert(email_map_obj).run()
 
 			except RqlRuntimeError:
 				form = RegisterForm(request.form)
@@ -259,7 +262,10 @@ def register():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-
+	""" 
+		The login view. Renders the login form and performs
+		the login if a user submits a form.
+	"""
 
 	if request.method == 'POST':
 		form = request.form
@@ -300,6 +306,10 @@ def login():
 @app.route('/logout')
 @login_required   
 def logout():
+	""" 
+		Logout the current user.
+	"""
+
 	logout_user()
 	flash('See ya later!')
 	return redirect(url_for('login'))
@@ -312,6 +322,7 @@ def index():
 	""" 
 		Loading and serving the home page of GraphBin. 
 	"""
+
 	return render_template('index.html', logged_in = current_user.is_authenticated())
 
 
@@ -321,6 +332,7 @@ def load_graph_list():
 	""" 
 		Load the list of graphs for a user.
 	"""
+
 	all_graphs = r.db(current_user['site_id']).table_list().run()
 	all_graphs.sort()
 	return render_template('components/account_components/account_graph_list.html', all_graphs=all_graphs)
@@ -332,12 +344,15 @@ def account():
 	""" 
 		Load the user's graph collection page (account).
 	"""
+
 	return render_template('account.html')
 
 
 @app.route('/public_load/<public_url>', methods=["GET"])
 def public_graph(public_url):
-	""" Public load of the graphs that are saved in user accounts"""
+	""" 
+		Public load of the graphs that are saved in user accounts
+	"""
 
 	pub_graph_data = None
 	nonregistered = False
@@ -393,6 +408,9 @@ def public_graph(public_url):
 
 @app.route('/<public_url>', methods=["GET"])
 def public_load(public_url):
+	""" 
+		Load a public graph via url.
+	"""
 
 	# try graphs that are public and stored in a user account.
 	pub_graph_cursor_registered = r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).get_all(public_url, index="url").run()
@@ -418,8 +436,10 @@ def public_load(public_url):
 
 @app.route('/nonregistered_create_graph', methods=["POST"])
 def nonregistered_create_graph():
-	""" """
-	""" Create a graph for users who are not registered """
+	""" 
+		Create a graph for users who are not registered.
+	"""
+
 	try:
 		public_association = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(8))
 
@@ -454,7 +474,10 @@ def nonregistered_create_graph():
 @app.route('/create_graph/<graphname>', methods=["POST"])
 @login_required
 def create_graph(graphname):
-	""" Create the graph with the given graphname """
+	""" 
+		Create the graph with the given graphname.
+	"""
+
 	db_name = current_user['site_id']
 	public_association = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(8))
 
@@ -491,6 +514,7 @@ def check_graph(graphname):
 	""" 
 		Loads the graph page.
 	"""
+
 	try:
 		r.db(current_user['site_id']).table(graphname).run() # if this runs, graphname exists
 		return jsonify(exists=True)
@@ -505,6 +529,7 @@ def delete_graph(graphname):
 		Delete the selected graph IF POST.
 		Render the delete graph prompt IF GET.
 	"""
+
 	if request.method == "GET":
 		return render_template('components/account_components/account_delete_graph.html', graphname=graphname)
 	elif request.method == "POST":
@@ -531,6 +556,7 @@ def graph_settings(graphname):
 	""" 
 		Load the prompt for settings in the graph. 
 	"""
+
 	return render_template('components/account_components/account_graph_settings.html', graphname=graphname)
 
 
@@ -556,11 +582,6 @@ def rename_graph(old_graphname):
 						'access': db_name + '+' + new_name
 					}
 	r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).filter(r.row['access'] == access_key_public_graph).update(new_access_data).run()
-	#get_all(access_key_public_graph, index="access").run()
-
-	# for d in pub_graph_cursor:
-	# 	pub_graph_obj = d
-
 
 	return jsonify(newName=new_name)
 
@@ -569,6 +590,7 @@ def graph_nonregistered(graphname):
 	""" 
 		Load the graph page if there is no user logged in.
 	"""
+
 	try:
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(graphname).run() # if the runs, graphname exists
 
@@ -592,6 +614,7 @@ def graph(graphname):
 	""" 
 		Loads the graph page if the user is logged in.
 	"""
+
 	try:
 		r.db(current_user['site_id']).table(graphname).run() # if this runs, graphname exists
 
