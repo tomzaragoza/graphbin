@@ -2,9 +2,9 @@
 	<div id="{{graph}}-list-item">
 		<h3>
 			<a href="/graph/{{graph}}">{{graph}}</a> 
-			<button class="btn btn-default pull-right settings" data-graph-name="{{graph}}">
+			<!-- <button class="btn btn-default pull-right settings" data-graph-name="{{graph}}">
 				<span class="glyphicon glyphicon-cog"></span>
-			</button>
+			</button> -->
 			<button class="btn btn-default pull-right delete" data-graph-name="{{graph}}">
 				<span class="glyphicon glyphicon-trash"></span>
 			</button>
@@ -12,18 +12,18 @@
 	</div>
 {% endfor %}
 <script>
-$("button.settings").on('click', function() {
-	var graphName = $(this).attr('data-graph-name');
+// $("button.settings").on('click', function() {
+// 	var graphName = $(this).attr('data-graph-name');
 
-	$.ajax({
-			type: "GET",
-			url: "/graph_settings/" + graphName,
-			success: function(settingsHtml) {
-				$("#response-box").html(settingsHtml);
-			}
-	})
+// 	$.ajax({
+// 			type: "GET",
+// 			url: "/graph_settings/" + graphName,
+// 			success: function(settingsHtml) {
+// 				$("#response-box").html(settingsHtml);
+// 			}
+// 	})
 
-});
+// });
 
 $("button.delete").on('click', function() {
 	var graphName = $(this).attr('data-graph-name');
