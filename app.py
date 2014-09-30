@@ -29,7 +29,7 @@ RDB_HOST =  os.environ.get('RDB_HOST') or 'localhost'
 RDB_PORT = os.environ.get('RDB_PORT') or 28015
 
 # main graph database
-DB_MAIN = "graphbox"
+DB_MAIN = "graphbin"
 
 # main user database
 DB_USERS = "users"
@@ -66,19 +66,19 @@ def dbSetup():
 	# Registered user's graph databases.
 	try:
 		r.db_create(DB_PUBLIC_GRAPHS).run(connection)
-		r.db(DB_PUBLIC_GRAPHS).table_create(URL_TO_GRAPHS).run()
+		r.db(DB_PUBLIC_GRAPHS).table_create(URL_TO_GRAPHS).run(connection)
 
-		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("url").run()
-		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("url").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("url").run(connection)
+		# r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("url").run(connection)
 
-		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("user").run()
-		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("user").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("user").run(connection)
+		# r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("user").run(connection)
 
-		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("graph").run()
-		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("graph").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("graph").run(connection)
+		# r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("graph").run(connection)
 
-		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("access").run()
-		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("access").run()
+		r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("access").run(connection)
+		# r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("access").run(connection)
 
 		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_PUBLIC_GRAPHS)
 	except RqlRuntimeError:
@@ -87,16 +87,16 @@ def dbSetup():
 	# NonRegistered user's graph databases.
 	try:
 		r.db_create(DB_NONREGISTERED_PUBLIC_GRAPHS).run(connection)
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table_create(URL_TO_GRAPHS).run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table_create(URL_TO_GRAPHS).run(connection)
 
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("url").run()
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("url").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("url").run(connection)
+		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("url").run(connection)
 
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("user").run()
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("user").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("user").run(connection)
+		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("user").run(connection)
 
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("graph").run()
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("graph").run()
+		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_create("graph").run(connection)
+		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).index_wait("graph").run(connection)
 
 		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_PUBLIC_GRAPHS)
 	except RqlRuntimeError:
@@ -114,14 +114,14 @@ def dbSetup():
 	try:
 		r.db_create(DB_EMAILS).run(connection)
 		print "created DB EMAILS"
-		r.db(DB_EMAILS).table_create(T_EMAILS).run()
-		print "created table for DB EMAILS TEMAILS"
+		r.db(DB_EMAILS).table_create(T_EMAILS).run(connection)
+		print "created table for DB EMAILS"
 
-		r.db(DB_EMAILS).table(T_EMAILS).index_create("email").run()
-		r.db(DB_EMAILS).table(T_EMAILS).index_wait("email").run()
+		r.db(DB_EMAILS).table(T_EMAILS).index_create("email").run(connection)
+		# r.db(DB_EMAILS).table(T_EMAILS).index_wait("email").run(connection)
 
-		r.db(DB_EMAILS).table(T_EMAILS).index_create("user").run()
-		r.db(DB_EMAILS).table(T_EMAILS).index_wait("user").run()
+		r.db(DB_EMAILS).table(T_EMAILS).index_create("user").run(connection)
+		# r.db(DB_EMAILS).table(T_EMAILS).index_wait("user").run(connection)
 
 		print 'Database {0} setup completed. Now run the app without --setup'.format(DB_EMAILS)
 	except RqlRuntimeError:
@@ -233,10 +233,10 @@ def register():
 
 				r.db(DB_USERS).table(hashed_username).insert(new_user).run()
 				r.db(DB_USERS).table(hashed_username).index_create("site_id").run()
-				r.db(DB_USERS).table(hashed_username).index_wait("site_id").run()
+				# r.db(DB_USERS).table(hashed_username).index_wait("site_id").run()
 
 				r.db(DB_USERS).table(hashed_username).index_create("email").run()
-				r.db(DB_USERS).table(hashed_username).index_wait("email").run()
+				# r.db(DB_USERS).table(hashed_username).index_wait("email").run()
 
 				email_map_obj = {
 									'username': form['username'],
@@ -459,13 +459,13 @@ def nonregistered_create_graph():
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table_create(public_association).run()
 
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("type").run()
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("type").run()
+		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("type").run()
 
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("node_name").run()
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("node_name").run()
+		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("node_name").run()
 
 		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_create("edge_name").run()
-		r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("edge_name").run()
+		# r.db(DB_NONREGISTERED_PUBLIC_GRAPHS).table(public_association).index_wait("edge_name").run()
 
 		return jsonify(created=True, url=unregistered_graph_data['url'])
 	except:
@@ -494,13 +494,13 @@ def create_graph(graphname):
 	r.db(db_name).table(graphname).insert(public_graph_data).run()
 
 	r.db(db_name).table(graphname).index_create("type").run()
-	r.db(db_name).table(graphname).index_wait("type").run()
+	# r.db(db_name).table(graphname).index_wait("type").run()
 
 	r.db(db_name).table(graphname).index_create("node_name").run()
-	r.db(db_name).table(graphname).index_wait("node_name").run()
+	# r.db(db_name).table(graphname).index_wait("node_name").run()
 
 	r.db(db_name).table(graphname).index_create("edge_name").run()
-	r.db(db_name).table(graphname).index_wait("edge_name").run()
+	# r.db(db_name).table(graphname).index_wait("edge_name").run()
 
 	# create table for user in public graphs
 	r.db(DB_PUBLIC_GRAPHS).table(URL_TO_GRAPHS).insert(public_graph_data).run()
